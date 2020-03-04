@@ -14,22 +14,22 @@ data:
       "metricsReporting": true,
       "conditions": [
         {
-          "type": "NTPProblem",
-          "reason": "NTPIsUp",
-          "message": "ntp service is up"
+          "type": "TestProblem",
+          "reason": "No problem",
+          "message": "script returned 0"
         }
       ],
       "rules": [
         {
           "type": "temporary",
-          "reason": "NTPIsDown",
+          "reason": "Problem",
           "path": "/config/custom-check.sh",
           "timeout": "3s"
         },
         {
           "type": "permanent",
-          "condition": "NTPProblem",
-          "reason": "NTPIsDown",
+          "condition": "TestProblem",
+          "reason": "Problem",
           "path": "/config/custom-check.sh",
           "timeout": "3s"
         }
@@ -38,7 +38,7 @@ data:
   custom-check.sh: |
     #!/bin/bash
 
-    exit 1
+    crictl --version
 kind: ConfigMap
 metadata:
   name: node-problem-detector-config

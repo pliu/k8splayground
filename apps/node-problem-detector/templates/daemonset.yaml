@@ -52,6 +52,9 @@ spec:
         - name: config
           mountPath: /config
           readOnly: true
+        - name: usr
+          mountPath: /usr
+          readOnly: true
       volumes:
       - name: log
         # Config `log` to your system log directory
@@ -60,13 +63,16 @@ spec:
       - name: kmsg
         hostPath:
           path: /dev/kmsg
+      - name: usr
+        hostPath:
+          path: /usr
       - name: localtime
         hostPath:
           path: /etc/localtime
       - name: config
         configMap:
           name: node-problem-detector-config
-          defaultMode: 0777
+          defaultMode: 0555
           items:
           - key: custom-plugin.json
             path: custom-plugin.json
