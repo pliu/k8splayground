@@ -5,7 +5,7 @@ metadata:
 subjects:
 - kind: ServiceAccount
   name: default
-  namespace: kube-system
+  namespace: {{ .Release.Namespace }}
 roleRef:
   kind: ClusterRole
   name: node-problem-detector-role

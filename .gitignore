@@ -1,1 +1,4 @@
 kind/*.conf
+charts/
+*.lock
+*_pf

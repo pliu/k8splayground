@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: node-problem-detector
-  namespace: kube-system
+  namespace: {{ .Release.Namespace }}
   labels:
     app: node-problem-detector
 spec:
@@ -78,3 +78,5 @@ spec:
             path: custom-plugin.json
           - key: custom-check.sh
             path: custom-check.sh
+          - key: custom-check2.sh
+            path: custom-check2.sh

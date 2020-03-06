@@ -17,20 +17,38 @@ data:
           "type": "TestProblem",
           "reason": "No problem",
           "message": "script returned 0"
+        },
+        {
+          "type": "TestProblem2",
+          "reason": "No problem",
+          "message": "script returned 0"
         }
       ],
       "rules": [
         {
           "type": "temporary",
-          "reason": "Problem",
+          "reason": "TempProblem",
           "path": "/config/custom-check.sh",
-          "timeout": "3s"
+          "timeout": "10s"
         },
         {
           "type": "permanent",
           "condition": "TestProblem",
-          "reason": "Problem",
+          "reason": "PermanentProblem",
           "path": "/config/custom-check.sh",
+          "timeout": "10s"
+        },
+        {
+          "type": "temporary",
+          "reason": "TempProblem2",
+          "path": "/config/custom-check2.sh",
+          "timeout": "3s"
+        },
+        {
+          "type": "permanent",
+          "condition": "TestProblem2",
+          "reason": "PermanentProblem2",
+          "path": "/config/custom-check2.sh",
           "timeout": "3s"
         }
       ]
@@ -39,7 +57,11 @@ data:
     #!/bin/bash
 
     crictl --version
+  custom-check2.sh: |
+    #!/bin/bash
+
+    exit 1
 kind: ConfigMap
 metadata:
   name: node-problem-detector-config
-  namespace: kube-system
+  namespace: {{ .Release.Namespace }}
