@@ -8,3 +8,17 @@ prometheus-operator:
         - sourceLabels: [__meta_kubernetes_pod_node_name]
           targetLabel: nodeName
           action: replace
+
+  grafana:
+    adminPassword: password
+
+scrape_endpoints:
+  - name: node-problem-detector
+    namespace: kube-system
+    label_key: app
+    label_value: node-problem-detector
+    port: 5678
+    relabelings:
+      - sourceLabels: [__meta_kubernetes_pod_node_name]
+        targetLabel: nodeName
+        action: replace

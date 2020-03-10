@@ -20,6 +20,7 @@ spec:
         - /node-problem-detector
         - --logtostderr
         - --config.custom-plugin-monitor=/config/custom-plugin.json
+        - --prometheus-address=0.0.0.0
         - --prometheus-port=5678
         image: k8s.gcr.io/node-problem-detector:v0.8.1
         resources:

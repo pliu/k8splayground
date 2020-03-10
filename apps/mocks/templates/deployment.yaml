@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name: mock-server
+  name: mock-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: mock-server
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: mock-server
+    spec:
+      containers:
+      - image: mock-server:0.0.1
+        name: mock-server

@@ -1,17 +1,15 @@
 CLUSTER_NAME=k8splayground-cluster
-CONFIG_PATH=./kind/$(CLUSTER_NAME).conf
-KUBECTL_CMD=kubectl --kubeconfig $(CONFIG_PATH)
 IMAGE=kindest/node:v1.16.4@sha256:b91a2c2317a000f3a783489dfb755064177dbc3a0b2f4147d50f04825d016f55
 
 .PHONY: kind_create
 kind_create:
-	kind create cluster --config ./kind/config.yaml --name $(CLUSTER_NAME) --image $(IMAGE)
-	kind get kubeconfig --name $(CLUSTER_NAME) > $(CONFIG_PATH)
-	kubectl patch configmap kube-proxy --patch "$(cat kind/kube-proxy-patch.yaml)" -n kube-system
+	kind create cluster --config=kind/config.yaml --name "$(CLUSTER_NAME)" --image $(IMAGE)
+	kubectl patch configmap kube-proxy --patch "$$(cat kind/kube-proxy-patch.yaml)" -n kube-system
 	kubectl rollout restart daemonset kube-proxy -n kube-system
 
 .PHONY: kind_destroy
 kind_destroy:
+	-make .prometheus_pf_stop
 	kind delete cluster --name $(CLUSTER_NAME)
 
 .PHONY: npd_apply
@@ -40,11 +38,21 @@ prometheus_delete:
 
 .PHONY: .prometheus_stop_pf
 .prometheus_pf_stop:
-	cat .prometheus_pf | while read line ; do \
+	-cat .prometheus_pf | while read line ; do \
 		kill $$line; \
 	done
 	rm .prometheus_pf
 
 .PHONY: prometheus_test_rules
 prometheus_test_rules:
-	find apps/prometheus-operator/tests -type f -name '*.yaml' -exec promtool test rules {} 
+	find apps/prometheus-operator/tests -type f -name '*.yaml' -exec promtool test rules {}
+
+.PHONY: mocks_apply
+mocks_apply:
+	docker build -t mock-server:0.0.1 apps/mocks/server
+	kind load docker-image mock-server:0.0.1 --name $(CLUSTER_NAME)
+	helm install mocks apps/mocks || helm upgrade mocks apps/mocks
+
+.PHONY: mocks_delete
+mocks_delete:
+	helm uninstall mocks

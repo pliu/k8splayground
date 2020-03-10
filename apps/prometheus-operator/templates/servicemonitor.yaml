@@ -1,0 +1,23 @@
+{{- $root := . -}}
+{{- range $entry := .Values.scrape_endpoints -}}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ $entry.name }}
+  labels:
+    release: {{ $root.Release.Name }}
+spec:
+  namespaceSelector:
+    matchNames:
+    - {{ $entry.namespace }}
+  selector:
+    matchLabels:
+      {{ $entry.label_key }}: {{ $entry.label_value }}
+  endpoints:
+  - port: prom-metrics
+  {{- if $entry.relabelings }}
+    relabelings:
+{{ toYaml $entry.relabelings | indent 4 }}
+  {{- end }}
+---
+{{ end -}}
