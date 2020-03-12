@@ -1,18 +1,24 @@
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  name: node-problem-detector
+  name: {{ .Release.Name }}
   namespace: {{ .Release.Namespace }}
   labels:
-    app: node-problem-detector
+{{- range $key, $value := .Values.labels }}
+    {{ $key }}: {{ $value }}
+{{- end }}
 spec:
   selector:
     matchLabels:
-      app: node-problem-detector
+{{- range $key, $value := .Values.labels }}
+      {{ $key }}: {{ $value }}
+{{- end }}
   template:
     metadata:
       labels:
-        app: node-problem-detector
+{{- range $key, $value := .Values.labels }}
+        {{ $key }}: {{ $value }}
+{{- end }}
     spec:
       containers:
       - name: node-problem-detector
@@ -21,7 +27,7 @@ spec:
         - --logtostderr
         - --config.custom-plugin-monitor=/config/custom-plugin.json
         - --prometheus-address=0.0.0.0
-        - --prometheus-port=5678
+        - --prometheus-port={{ .Values.metrics_port }}
         image: k8s.gcr.io/node-problem-detector:v0.8.1
         resources:
           limits:
@@ -72,7 +78,7 @@ spec:
           path: /etc/localtime
       - name: config
         configMap:
-          name: node-problem-detector-config
+          name: {{ .Release.Name }}
           defaultMode: 0555
           items:
           - key: custom-plugin.json

@@ -1,0 +1,3 @@
+metrics_port: 5678
+labels:
+  app: node-problem-detector

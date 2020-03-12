@@ -1,0 +1,17 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+{{- range $key, $value := .Values.labels }}
+    {{ $key }}: {{ $value }}
+{{- end }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  selector:
+{{- range $key, $value := .Values.labels }}
+    {{ $key }}: {{ $value }}
+{{- end }}
+  ports:
+  - name: prom-metrics
+    port: {{ .Values.metrics_port }}

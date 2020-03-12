@@ -8,13 +8,24 @@ metadata:
     release: {{ $root.Release.Name }}
 spec:
   namespaceSelector:
+  {{- if $entry.namespaces }}
     matchNames:
-    - {{ $entry.namespace }}
+    {{- range $namespace := $entry.namespaces }}
+    - {{ $namespace }}
+    {{- end }}
+  {{- else }}
+    any: true
+  {{- end }}
   selector:
     matchLabels:
-      {{ $entry.label_key }}: {{ $entry.label_value }}
+  {{- range $key, $value := $entry.labels }}
+      {{ $key }}: {{ $value }}
+  {{- end }}
   endpoints:
-  - port: prom-metrics
+  - port: {{ default "prom-metrics" $entry.portName }}
+  {{- if $entry.metricsPath }}
+    path: {{ $entry.metricsPath }}
+  {{- end }}
   {{- if $entry.relabelings }}
     relabelings:
 {{ toYaml $entry.relabelings | indent 4 }}

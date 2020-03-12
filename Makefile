@@ -24,10 +24,12 @@ npd_delete:
 .PHONY: prometheus_apply
 prometheus_apply:
 	helm dependency update apps/prometheus-operator
-	helm install prometheus-operator apps/prometheus-operator || helm upgrade prometheus-operator apps/prometheus-operator
+	helm install prometheus-operator apps/prometheus-operator || helm upgrade prometheus-operator apps/prometheus-operator || \
+	helm uninstall prometheus-operator && helm install prometheus-operator apps/prometheus-operator
 
 .PHONY: prometheus_delete
 prometheus_delete:
+	-make .prometheus_pf_stop
 	helm uninstall prometheus-operator
 	kubectl delete service prometheus-operator-kubelet -n kube-system
 

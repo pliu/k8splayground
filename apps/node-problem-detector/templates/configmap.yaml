@@ -63,5 +63,5 @@ data:
     exit 1
 kind: ConfigMap
 metadata:
-  name: node-problem-detector-config
+  name: {{ .Release.Name }}
   namespace: {{ .Release.Namespace }}

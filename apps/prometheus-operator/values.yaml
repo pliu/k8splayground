@@ -14,10 +14,10 @@ prometheus-operator:
 
 scrape_endpoints:
   - name: node-problem-detector
-    namespace: kube-system
-    label_key: app
-    label_value: node-problem-detector
-    port: 5678
+    namespaces:
+      - kube-system
+    labels:
+      app: node-problem-detector
     relabelings:
       - sourceLabels: [__meta_kubernetes_pod_node_name]
         targetLabel: nodeName
