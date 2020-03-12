@@ -1,0 +1,38 @@
+rule_files:
+- toy_alerts.yaml
+
+evaluation_interval: 1m
+
+tests:
+- interval: 1m
+  input_series:
+  - series: 'problem_counter{reason="TempProblem2", nodeName="a"}'
+    values: '30x10'
+  - series: 'problem_counter{reason="TempProblem2", nodeName="b"}'
+    values: '10 31 40 10 10 50 60 70'
+
+  alert_rule_test:
+  - eval_time: 1m
+    alertname: ProblemCounterHigh
+  - eval_time: 2m
+    alertname: ProblemCounterHigh
+    exp_alerts:
+    - exp_labels:
+        severity: critical
+        reason: TempProblem2
+        nodeName: b
+      exp_annotations:
+        message: "Problem counter high on b: 40"
+  - eval_time: 3m
+    alertname: ProblemCounterHigh
+  - eval_time: 5m
+    alertname: ProblemCounterHigh
+  - eval_time: 6m
+    alertname: ProblemCounterHigh
+    exp_alerts:
+    - exp_labels:
+        severity: critical
+        reason: TempProblem2
+        nodeName: b
+      exp_annotations:
+        message: "Problem counter high on b: 60"

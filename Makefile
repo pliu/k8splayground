@@ -24,8 +24,7 @@ npd_delete:
 .PHONY: prometheus_apply
 prometheus_apply:
 	helm dependency update apps/prometheus-operator
-	helm install prometheus-operator apps/prometheus-operator || helm upgrade prometheus-operator apps/prometheus-operator || \
-	helm uninstall prometheus-operator && helm install prometheus-operator apps/prometheus-operator
+	helm install prometheus-operator apps/prometheus-operator || helm upgrade prometheus-operator apps/prometheus-operator
 
 .PHONY: prometheus_delete
 prometheus_delete:
@@ -47,7 +46,7 @@ prometheus_delete:
 
 .PHONY: prometheus_test_rules
 prometheus_test_rules:
-	find apps/prometheus-operator/tests -type f -name '*.yaml' -exec promtool test rules {}
+	find apps/prometheus-operator/alerts -type f -name '*_test.yaml' -exec promtool test rules {} +
 
 .PHONY: mocks_apply
 mocks_apply:

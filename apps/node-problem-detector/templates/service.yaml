@@ -6,7 +6,6 @@ metadata:
 {{- range $key, $value := .Values.labels }}
     {{ $key }}: {{ $value }}
 {{- end }}
-  namespace: {{ .Release.Namespace }}
 spec:
   selector:
 {{- range $key, $value := .Values.labels }}

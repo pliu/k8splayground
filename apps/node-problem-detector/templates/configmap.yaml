@@ -64,4 +64,3 @@ data:
 kind: ConfigMap
 metadata:
   name: {{ .Release.Name }}
-  namespace: {{ .Release.Namespace }}

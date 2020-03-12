@@ -5,20 +5,20 @@ prometheus-operator:
   nodeExporter:
     serviceMonitor:
       relabelings:
-        - sourceLabels: [__meta_kubernetes_pod_node_name]
-          targetLabel: nodeName
-          action: replace
+      - sourceLabels: [__meta_kubernetes_pod_node_name]
+        targetLabel: nodeName
+        action: replace
 
   grafana:
     adminPassword: password
 
 scrape_endpoints:
-  - name: node-problem-detector
-    namespaces:
-      - kube-system
-    labels:
-      app: node-problem-detector
-    relabelings:
-      - sourceLabels: [__meta_kubernetes_pod_node_name]
-        targetLabel: nodeName
-        action: replace
+- name: node-problem-detector
+  namespaces:
+  - kube-system
+  labels:
+    app: node-problem-detector
+  relabelings:
+  - sourceLabels: [__meta_kubernetes_pod_node_name]
+    targetLabel: nodeName
+    action: replace

@@ -1,0 +1,10 @@
+groups:
+- name: toy_alerts
+  rules:
+  - alert: ProblemCounterHigh
+    annotations:
+      message: 'Problem counter high on {{ $labels.nodeName }}: {{ $value }}'
+    expr: problem_counter{reason="TempProblem2"} > 30
+    for: 1m
+    labels:
+      severity: critical
