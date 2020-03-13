@@ -1,8 +1,6 @@
 rule_files:
 - toy_alerts.yaml
 
-evaluation_interval: 1m
-
 tests:
 - interval: 1m
   input_series:
@@ -23,6 +21,7 @@ tests:
         nodeName: b
       exp_annotations:
         message: "Problem counter high on b: 40"
+        test: "This is an external label: test"
   - eval_time: 3m
     alertname: ProblemCounterHigh
   - eval_time: 5m
@@ -36,3 +35,7 @@ tests:
         nodeName: b
       exp_annotations:
         message: "Problem counter high on b: 60"
+        test: "This is an external label: test"
+
+  external_labels:
+    cluster: test

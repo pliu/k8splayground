@@ -5,6 +5,7 @@ route:
   receiver: "null"
   group_by:
   - alertname
+  - service
   routes:
   - receiver: "mock"
     match:
@@ -18,6 +19,6 @@ receivers:
 - name: "mock"
   webhook_configs:
   - send_resolved: true
-    url: http://mock-server.default.svc.cluster.local/
+    url: {{ .Values.alertmanagerConfig.url }}
 
 templates: []

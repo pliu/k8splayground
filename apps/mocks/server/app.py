@@ -1,4 +1,5 @@
 from __future__ import print_function
+import json
 import signal
 import sys
 from flask import Flask, request
@@ -13,7 +14,11 @@ def receiveSignal(signalNumber, frame):
 def hello_world():
     data = request.data
     if data:
-       print(data, file=sys.stderr)
+        try:
+            j = json.loads(data)
+            print(json.dumps(j, indent=4), file=sys.stderr)
+        except Exception:
+            print("Could not parse", data, file=sys.stderr)
     return 'Hey, we have Flask in a Docker container!'
 
 
