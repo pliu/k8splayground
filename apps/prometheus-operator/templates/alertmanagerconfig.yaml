@@ -1,0 +1,9 @@
+apiVersion: v1
+data:
+  alertmanager.yaml: {{ .Files.Get "alertmanager/config.yaml" | b64enc | quote }}
+kind: Secret
+metadata:
+  labels:
+    release: {{ .Release.Name }}
+  name: {{ (index .Values "prometheus-operator").alertmanager.alertmanagerSpec.configSecret }}
+type: Opaque

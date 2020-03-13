@@ -12,6 +12,15 @@ prometheus-operator:
   grafana:
     adminPassword: password
 
+  prometheus:
+    prometheusSpec:
+      logLevel: debug
+
+  alertmanager:
+    alertmanagerSpec:
+      configSecret: alertmanager-config
+      logLevel: debug
+
 scrape_endpoints:
 - name: node-problem-detector
   namespaces:

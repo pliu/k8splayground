@@ -1,0 +1,23 @@
+global:
+  resolve_timeout: 5m
+
+route:
+  receiver: "null"
+  group_by:
+  - alertname
+  routes:
+  - receiver: "mock"
+    match:
+      severity: critical
+  group_wait: 30s
+  group_interval: 1m
+  repeat_interval: 12h
+
+receivers:
+- name: "null"
+- name: "mock"
+  webhook_configs:
+  - send_resolved: true
+    url: http://mock-server.default.svc.cluster.local/
+
+templates: []
