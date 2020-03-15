@@ -1,17 +1,17 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mock-server
+  name: {{ .Release.Name }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app.kubernetes.io/name: mock-server
+      app.kubernetes.io/name: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: mock-server
+        app.kubernetes.io/name: {{ .Release.Name }}
     spec:
       containers:
       - image: mock-server:0.0.1
-        name: mock-server
+        name: {{ .Release.Name }}

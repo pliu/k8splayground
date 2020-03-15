@@ -2,7 +2,7 @@
 
 
 ## Testing
-Configuration change propagation can be validated from the Prometheus/Grafana/Alertmanager UIs (after applying NGINX Ingress).
+If nginx-ingress is running, configuration changes can be verified from the Prometheus/Grafana/Alertmanager UIs.
 ```
 localhost/prometheus
 localhost/grafana

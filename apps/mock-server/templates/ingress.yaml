@@ -10,5 +10,5 @@ spec:
       paths:
       - path: /mock-server
         backend:
-          serviceName: mock-server
+          serviceName: {{ .Release.Name }}
           servicePort: 80

@@ -3,14 +3,14 @@ IMAGE=kindest/node:v1.16.4@sha256:b91a2c2317a000f3a783489dfb755064177dbc3a0b2f41
 
 .PHONY: kind_create
 kind_create:
-	kind create cluster --config=kind/config.yaml --name "$(CLUSTER_NAME)" --image $(IMAGE)
+	kind create cluster --config=kind/config.yaml --name $(CLUSTER_NAME) --image $(IMAGE)
 
 .PHONY: kind_destroy
 kind_destroy:
 	kind delete cluster --name $(CLUSTER_NAME)
 
 .PHONY: apply_all
-apply_all: npd_apply mocks_apply nginx_apply prometheus_apply
+apply_all: npd_apply mock_apply nginx_apply prometheus_apply
 	echo 'Everything applied'
 
 .PHONY: npd_apply
@@ -36,15 +36,15 @@ prometheus_delete:
 prometheus_test_rules:
 	find apps/prometheus-operator/alerts -type f -name '*_test.yaml' -exec promtool test rules {} +
 
-.PHONY: mocks_apply
-mocks_apply:
-	docker build -t mock-server:0.0.1 apps/mocks/server
+.PHONY: mock_apply
+mock_apply:
+	docker build -t mock-server:0.0.1 apps/mock-server/server
 	kind load docker-image mock-server:0.0.1 --name $(CLUSTER_NAME)
-	helm install mocks apps/mocks || helm upgrade mocks apps/mocks
+	helm install mock-server apps/mock-server || helm upgrade mock-server apps/mock-server
 
-.PHONY: mocks_delete
-mocks_delete:
-	helm uninstall mocks
+.PHONY: mock_delete
+mock_delete:
+	helm uninstall mock-server
 
 .PHONY: nginx_apply
 nginx_apply:
