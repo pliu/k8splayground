@@ -1,0 +1,22 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ .Release.Name }}
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /prometheus(/|$)(.*)
+        backend:
+          serviceName: prometheus-operator-prometheus
+          servicePort: 9090
+      - path: /grafana(/|$)(.*)
+        backend:
+          serviceName: prometheus-operator-grafana
+          servicePort: 80
+      - path: /alertmanager(/|$)(.*)
+        backend:
+          serviceName: prometheus-operator-alertmanager
+          servicePort: 9093

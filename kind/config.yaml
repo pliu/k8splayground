@@ -1,6 +1,33 @@
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
+kubeadmConfigPatches:
+- |
+  kind: KubeProxyConfiguration
+  metricsBindAddress: 0.0.0.0:10249
+- |
+  kind: ClusterConfiguration
+  etcd:
+    local:
+      extraArgs:
+        listen-metrics-urls: "http://0.0.0.0:2381"
 nodes:
-  - role: control-plane
-  - role: worker
-  - role: worker
+- role: control-plane
+- role: worker
+  kubeadmConfigPatches:
+  - |
+    kind: JoinConfiguration
+    nodeRegistration:
+      kubeletExtraArgs:
+        node-labels: "ingress-ready=true"
+  extraPortMappings:
+  - containerPort: 30000
+    hostPort: 80
+    protocol: TCP
+- role: worker
+- role: worker
+  kubeadmConfigPatches:
+  - |
+    kind: JoinConfiguration
+    nodeRegistration:
+      kubeletExtraArgs:
+        register-with-taints: "playground_test=ensure_only_tolerations_run_here:NoSchedule"

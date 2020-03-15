@@ -2,10 +2,6 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: {{ .Release.Name }}
-  labels:
-{{- range $key, $value := .Values.labels }}
-    {{ $key }}: {{ $value }}
-{{- end }}
 spec:
   selector:
     matchLabels:
@@ -19,6 +15,10 @@ spec:
         {{ $key }}: {{ $value }}
 {{- end }}
     spec:
+      tolerations:
+      - key: playground_test
+        operator: Exists
+        effect: NoSchedule
       containers:
       - name: node-problem-detector
         command:

@@ -2,7 +2,12 @@
 
 
 ## Testing
-Configuration change propagation can be validated from the Prometheus UI (after port-forwarding).
+Configuration change propagation can be validated from the Prometheus/Grafana/Alertmanager UIs (after applying NGINX Ingress).
+```
+localhost/prometheus
+localhost/grafana
+localhost/alertmanager
+```
 
 ## Commands
 ```
@@ -11,12 +16,6 @@ make prometheus_apply
 
 Delete prometheus operator:
 make prometheus_delete
-
-Port-forward Prometheus, Grafana, and Alertmanager to ports 9000, 9001, and 9002, respectively:
-make .prometheus_pf
-
-Stop port-forwarding:
-make .prometheus_pf_stop
 
 Test alerting rules:
 make prometheus_test_rules

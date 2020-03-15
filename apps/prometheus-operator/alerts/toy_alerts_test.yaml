@@ -4,10 +4,10 @@ rule_files:
 tests:
 - interval: 1m
   input_series:
-  - series: 'problem_counter{reason="TempProblem2", nodeName="a"}'
-    values: '30x10'
-  - series: 'problem_counter{reason="TempProblem2", nodeName="b"}'
-    values: '10 31 40 10 10 50 60 70'
+  - series: problem_counter{reason="TempProblem2", nodeName="a"}
+    values: 30x10
+  - series: problem_counter{reason="TempProblem2", nodeName="b"}
+    values: 10 31 40 10 10 50 60 70
 
   alert_rule_test:
   - eval_time: 1m

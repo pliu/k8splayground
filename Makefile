@@ -1,16 +1,17 @@
-CLUSTER_NAME=k8splayground-cluster
+CLUSTER_NAME=k8splayground
 IMAGE=kindest/node:v1.16.4@sha256:b91a2c2317a000f3a783489dfb755064177dbc3a0b2f4147d50f04825d016f55
 
 .PHONY: kind_create
 kind_create:
 	kind create cluster --config=kind/config.yaml --name "$(CLUSTER_NAME)" --image $(IMAGE)
-	kubectl patch configmap kube-proxy --patch "$$(cat kind/kube-proxy-patch.yaml)" -n kube-system
-	kubectl rollout restart daemonset kube-proxy -n kube-system
 
 .PHONY: kind_destroy
 kind_destroy:
-	-make .prometheus_pf_stop
 	kind delete cluster --name $(CLUSTER_NAME)
+
+.PHONY: apply_all
+apply_all: npd_apply mocks_apply nginx_apply prometheus_apply
+	echo 'Everything applied'
 
 .PHONY: npd_apply
 npd_apply:
@@ -28,21 +29,8 @@ prometheus_apply:
 
 .PHONY: prometheus_delete
 prometheus_delete:
-	-make .prometheus_pf_stop
 	helm uninstall prometheus-operator
 	kubectl delete service prometheus-operator-kubelet -n kube-system
-
-.prometheus_pf:
-	{ kubectl port-forward svc/prometheus-operator-prometheus 9000:9090 >> /dev/null 2>&1 & echo $$! >> .prometheus_pf; }
-	{ kubectl port-forward svc/prometheus-operator-grafana 9001:80 >> /dev/null 2>&1 & echo $$! >> .prometheus_pf; }
-	{ kubectl port-forward svc/prometheus-operator-alertmanager 9002:9093 >> /dev/null 2>&1 & echo $$! >> .prometheus_pf; }
-
-.PHONY: .prometheus_stop_pf
-.prometheus_pf_stop:
-	-cat .prometheus_pf | while read line ; do \
-		kill $$line; \
-	done
-	rm .prometheus_pf
 
 .PHONY: prometheus_test_rules
 prometheus_test_rules:
@@ -57,3 +45,12 @@ mocks_apply:
 .PHONY: mocks_delete
 mocks_delete:
 	helm uninstall mocks
+
+.PHONY: nginx_apply
+nginx_apply:
+	helm dependency update apps/nginx-ingress
+	helm install nginx-ingress apps/nginx-ingress || helm upgrade nginx-ingress apps/nginx-ingress
+
+.PHONY: nginx_delete
+nginx_delete:
+	helm uninstall nginx-ingress

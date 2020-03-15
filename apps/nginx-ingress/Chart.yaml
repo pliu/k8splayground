@@ -1,0 +1,7 @@
+apiVersion: v1
+name: nginx-ingress-playground
+version: 0.0.1
+dependencies:
+- name: nginx-ingress
+  version: 1.33.5
+  repository: https://kubernetes-charts.storage.googleapis.com/

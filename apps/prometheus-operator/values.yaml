@@ -2,24 +2,43 @@ prometheus-operator:
   defaultRules:
     create: false
 
+  kubeEtcd:
+    service:
+      targetPort: 2381
+
   nodeExporter:
     serviceMonitor:
       relabelings:
-      - sourceLabels: [__meta_kubernetes_pod_node_name]
+      - sourceLabels: 
+        - __meta_kubernetes_pod_node_name
         targetLabel: nodeName
         action: replace
 
   grafana:
     adminPassword: password
+    grafana.ini:
+      log:
+        mode: console
+      paths:
+        data: /var/lib/grafana/data
+        logs: /var/log/grafana
+        plugins: /var/lib/grafana/plugins
+        provisioning: /etc/grafana/provisioning
+      server:
+        root_url: http://localhost/grafana
 
   prometheus:
     prometheusSpec:
+      externalUrl: prometheus
+      ruleSelectorNilUsesHelmValues: false
+      serviceMonitorSelectorNilUsesHelmValues: false
       logLevel: debug
       externalLabels:
         cluster: test
 
   alertmanager:
     alertmanagerSpec:
+      externalUrl: http://localhost/alertmanager
       configSecret: alertmanager-config
       logLevel: debug
 
@@ -30,9 +49,16 @@ scrape_endpoints:
   labels:
     app: node-problem-detector
   relabelings:
-  - sourceLabels: [__meta_kubernetes_pod_node_name]
+  - sourceLabels:
+    - __meta_kubernetes_pod_node_name
     targetLabel: nodeName
     action: replace
+- name: nginx-ingress
+  namespaces:
+  - default
+  portName: metrics
+  labels:
+    app: nginx-ingress
 
 alertmanagerConfig:
   url: http://mock-server.default.svc.cluster.local/

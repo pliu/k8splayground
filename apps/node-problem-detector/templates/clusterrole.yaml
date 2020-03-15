@@ -3,12 +3,22 @@ kind: ClusterRole
 metadata:
   name: {{ .Release.Name }}
 rules:
-- apiGroups: [""]
-  resources: ["nodes/status"]
-  verbs: ["patch"]
-- apiGroups: [""]
-  resources: ["events"]
-  verbs: ["create", "patch"]
-- apiGroups: [""]
-  resources: ["nodes"]
-  verbs: ["get"]
+- apiGroups:
+  - ""
+  resources:
+  - "nodes/status"
+  verbs:
+  - "patch"
+- apiGroups:
+  - ""
+  resources:
+  - "events"
+  verbs:
+  - "create"
+  - "patch"
+- apiGroups:
+  - ""
+  resources:
+  - "nodes"
+  verbs:
+  - "get"

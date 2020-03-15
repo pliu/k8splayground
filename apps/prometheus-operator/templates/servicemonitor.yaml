@@ -4,8 +4,6 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: {{ $entry.name }}
-  labels:
-    release: {{ $root.Release.Name }}
 spec:
   namespaceSelector:
   {{- if $entry.namespaces }}
@@ -27,8 +25,7 @@ spec:
     path: {{ $entry.metricsPath }}
   {{- end }}
   {{- if $entry.relabelings }}
-    relabelings:
-{{ toYaml $entry.relabelings | indent 4 }}
+    relabelings: {{ toYaml $entry.relabelings | nindent 4 }}
   {{- end }}
 ---
 {{ end -}}

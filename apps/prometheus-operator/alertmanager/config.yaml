@@ -7,7 +7,7 @@ route:
   - alertname
   - service
   routes:
-  - receiver: "mock"
+  - receiver: mock
     match:
       severity: critical
   group_wait: 30s
@@ -16,7 +16,7 @@ route:
 
 receivers:
 - name: "null"
-- name: "mock"
+- name: mock
   webhook_configs:
   - send_resolved: true
     url: {{ .Values.alertmanagerConfig.url }}
