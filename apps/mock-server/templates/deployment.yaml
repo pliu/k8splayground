@@ -12,6 +12,8 @@ spec:
       labels:
         app.kubernetes.io/name: {{ .Release.Name }}
     spec:
+      nodeSelector:
+        mock-server: "true"
       containers:
       - image: mock-server:0.0.1
         name: {{ .Release.Name }}

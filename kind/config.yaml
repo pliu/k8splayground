@@ -18,7 +18,7 @@ nodes:
     kind: JoinConfiguration
     nodeRegistration:
       kubeletExtraArgs:
-        node-labels: "ingress-ready=true"
+        node-labels: "mock-server=true"
   extraPortMappings:
   - containerPort: 30000
     hostPort: 80

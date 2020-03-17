@@ -5,11 +5,8 @@ nginx-ingress:
   controller:
     metrics:
       enabled: true
-    nodeSelector:
-      ingress-ready: "true"
     service:
       type: NodePort
       nodePorts:
         http: "30000"
-      externalTrafficPolicy: Local
       enableHttps: false
