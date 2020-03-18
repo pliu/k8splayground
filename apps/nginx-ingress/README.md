@@ -7,7 +7,7 @@ The convention for this project is for apps that wish to expose endpoints via in
 
 Examples of things to experiment with:
 
-- NGINX routing configurations
+- NGINX routing configurations, including target rewrites
 - how traffic on the local machine gets routed through the Docker "hosts" into the Kubernetes network and finally to its destination
 - how source IP is handled by different configurations of a service
 

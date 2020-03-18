@@ -1,5 +1,5 @@
 {{- $root := . -}}
-{{- range $path, $bytes := .Files.Glob "alerts/*.yaml" -}}
+{{- range $path, $bytes := .Files.Glob "rules/*.yaml" -}}
   {{- $filename := base (trimSuffix ".yaml" $path) | camelcase | lower -}}
   {{- if not (hasSuffix "test" $filename) -}}
 apiVersion: monitoring.coreos.com/v1
