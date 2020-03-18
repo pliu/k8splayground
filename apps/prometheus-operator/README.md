@@ -11,7 +11,7 @@ Prometheus Operator automates deployment of the stack by automatically providing
 
 Prometheus' configuration is templated out and configurable through values.yaml. Exporters are configured through ServiceMonitor objects that tie an exporter to the service it is meant to scrape. Similarly, PrometheusRule objects store rules that are imported into the Prometheus instance(s). In this project, ServiceMonitor creation is templated out and can be configured in values.yaml while PrometheusRule creation is automated based on the rules found in rules/. The base Prometheus Operator chart's default rules have been disabled, but its default exporters are enabled and can be configured in values.yaml.
 
-Alertmanager's configuration (alertmanager/config.yaml) is rendered into a Secret object which is mounted by the Alertmanager instance(s).
+Alertmanager's configuration (alertmanager/alertmanager.yaml) is rendered into a Secret object which is mounted by the Alertmanager instance(s).
 
 Grafana's configuration can be found in values.yaml. This, along with dashboard and data source configurations, are rendered by the base Prometheus Operator chart into ConfigMap objects which are mounted by Grafana instance(s).
 
@@ -30,15 +30,15 @@ Examples of things to experiment with:
 - adding new Grafana data sources
 
 ## Testing
-If nginx-ingress is running, configuration changes can be verified from the Prometheus/Grafana/Alertmanager UIs (the Grafana username/password is admin/password).
+If nginx-ingress is running, configuration changes can be verified from the Prometheus/Grafana/Alertmanager UIs on one's local machine (the Grafana username/password is admin/password).
 ```
 localhost:80/prometheus
 localhost:80/grafana
 localhost:80/alertmanager
 ```
-Similarly, exporters and rules can be viewed in the Prometheus UI, dashboards in the Grafana UI, and triggered alerts in the Alertmanager UI. 
+Similarly, exporters and rules can be viewed in the Prometheus UI, dashboards in the Grafana UI, and triggered alerts in the Alertmanager UI.
 
-Alerts are currently routed to mock-server, which logs their JSON payload for observability (see mock-server for how to view the logs).
+One can also send test alerts to Alertmanager using curl to test routing rules. Alerts tagged "severity": "critical" are currently routed to mock-server, which logs their JSON payload for observability (see mock-server for how to view the logs).
 
 ## Commands
 ```
@@ -50,4 +50,7 @@ make prometheus_delete
 
 Test alerting rules:
 make prometheus_test_rules
+
+Send test alert to Alertmanager:
+curl -H "Content-Type: application/json" -d '[{"labels":{"alertname":"TestAlert","severity":"critical"}}]' localhost:80/alertmanager/api/v1/alerts
 ```

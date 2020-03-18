@@ -34,7 +34,7 @@ prometheus_delete:
 
 .PHONY: prometheus_test_rules
 prometheus_test_rules:
-	find apps/prometheus-operator/alerts -type f -name '*_test.yaml' -exec promtool test rules {} +
+	find apps/prometheus-operator/rules -type f -name '*_test.yaml' -exec promtool test rules {} +
 
 .PHONY: mock_apply
 mock_apply:

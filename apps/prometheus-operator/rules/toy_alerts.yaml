@@ -5,7 +5,7 @@ groups:
     annotations:
       message: 'Problem counter high on {{ $labels.nodeName }}: {{ $value }}'
       test: 'This is an external label: {{ $externalLabels.cluster }}'
-    expr: problem_counter{reason="TempProblem2"} > 30
+    expr: problem_counter{reason="TempProblem2"} > 5
     for: 1m
     labels:
       severity: critical

@@ -5,9 +5,9 @@ tests:
 - interval: 1m
   input_series:
   - series: problem_counter{reason="TempProblem2", nodeName="a"}
-    values: 30x10
+    values: 5x10
   - series: problem_counter{reason="TempProblem2", nodeName="b"}
-    values: 10 31 40 10 10 50 60 70
+    values: 5 6 7 5 5 7 8 9
 
   alert_rule_test:
   - eval_time: 1m
@@ -20,7 +20,7 @@ tests:
         reason: TempProblem2
         nodeName: b
       exp_annotations:
-        message: "Problem counter high on b: 40"
+        message: "Problem counter high on b: 7"
         test: "This is an external label: test"
   - eval_time: 3m
     alertname: ProblemCounterHigh
@@ -34,7 +34,7 @@ tests:
         reason: TempProblem2
         nodeName: b
       exp_annotations:
-        message: "Problem counter high on b: 60"
+        message: "Problem counter high on b: 8"
         test: "This is an external label: test"
 
   external_labels:

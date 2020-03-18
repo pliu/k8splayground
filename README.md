@@ -63,4 +63,7 @@ make apply_all
 
 Check which apps are currently deployed:
 helm list --all-namespaces
+
+Get a shell into a Docker "host":
+docker exec -it <container name [`docker ps` to find it]> /bin/bash
 ```

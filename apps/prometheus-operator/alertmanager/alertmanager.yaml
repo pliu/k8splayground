@@ -5,7 +5,6 @@ route:
   receiver: "null"
   group_by:
   - alertname
-  - service
   routes:
   - receiver: mock
     match:
@@ -18,7 +17,6 @@ receivers:
 - name: "null"
 - name: mock
   webhook_configs:
-  - send_resolved: true
-    url: {{ .Values.alertmanagerConfig.url }}
+  - url: {{ .Values.alertmanagerConfig.url }}
 
 templates: []
