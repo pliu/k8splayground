@@ -19,7 +19,7 @@ Examples of things to experiment with:
 For how ingress works, see the nginx-ingress app's README.
 
 ## Testing
-The expected behavior of the mock-server is to log the JSON payload after logging the request and to return "Hey, we have Flask in a Docker container!".
+The expected behavior of the mock-server is to log the JSON payload after logging the request and to return "You hit: <path the request was directed to>".
 
 If nginx-ingress is running, one can GET or POST to the mock server at localhost:80/mock-server from the local machine.
 

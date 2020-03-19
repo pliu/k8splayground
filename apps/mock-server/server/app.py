@@ -6,12 +6,15 @@ from flask import Flask, request
 
 app = Flask(__name__)
 
+
 def receiveSignal(signalNumber, frame):
     print("Received", signalNumber, file=sys.stderr)
     exit(0)
 
-@app.route('/', methods=['GET', 'POST'])
-def hello_world():
+
+@app.route('/', methods=['GET', 'POST'], defaults={'u_path': '/'})
+@app.route('/<path:u_path>', methods=['GET', 'POST'])
+def payload_dump(u_path):
     data = request.data
     if data:
         try:
@@ -19,7 +22,7 @@ def hello_world():
             print(json.dumps(j, indent=4), file=sys.stderr)
         except Exception:
             print("Could not parse", data, file=sys.stderr)
-    return 'Hey, we have Flask in a Docker container!'
+    return "You hit: %s" % u_path
 
 
 if __name__ == '__main__':
