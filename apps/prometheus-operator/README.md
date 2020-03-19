@@ -3,7 +3,7 @@ Prometheus Operator deploys a Prometheus-based monitoring stack that includes Gr
 
 Prometheus is a popular time-series database that is used for collecting, processing, and alerting on metrics. Specifically, applications that wish to send metrics to Prometheus expose a metrics endpoint that is periodically scraped by Prometheus exporters (the exporters are configured as part of Prometheus' configuration). Prometheus then applies a set of rules (defined in a set of YAML files) to the metrics for processing and possible alerting.
 
-In the case of alerts being triggered, they are sent to Alertmanager. Alertmanager subsequently preprocesses the alerts (e.g., additional formatting, grouping) and routes them to receivers (e.g., Slack, arbitrary webhook endpoint) based on routing rules defined in its configuration. Alertmanager keeps track of alerts it has received, allowing users to silence superfluous alerts.
+In the case of alerts being triggered, they are sent to Alertmanager. Alertmanager subsequently preprocesses the alerts (e.g., additional formatting, grouping) and routes them to receivers (e.g., Slack, arbitrary webhook endpoint) based on routing rules defined in its configuration. The routing tree is traversed by recursively matching against the children of the node it last matched, starting at the root, and calling the receiver of the last node it matches. A matched node with continue set to true effectively starts another tree traversal at the node's next sibling as if the matched node had not matched (see alertmanager/alertmanager.yaml for an example). Alertmanager also keeps track of alerts it has received, allowing users to silence superfluous alerts.
 
 Grafana is the visualization component of the Prometheus monitoring and alerting stack. It can connect to a number of data sources, Prometheus amongst them, and render graphs, charts, tables, etc. based on queries on the metrics in the data sources. These can then be saved as dashboards for continuous display or shared with others.
 
@@ -22,8 +22,9 @@ The convention for this project is for apps that wish to expose metrics via endp
 Examples of things to experiment with:
 
 - understanding how metrics labels and alert labels are used by Prometheus and Alertmanager, respectively
+- add and remove labels from exported metrics
 - creating new receivers (e.g. Slack)
-- creating a routing tree using label matching with which to route alerts
+- understand and create routing trees using label matching to route alerts
 - adding exporters to scrape metrics from new services
 - adding new alerting rules
 - adding new Grafana dashboards
@@ -38,7 +39,7 @@ localhost:80/alertmanager
 ```
 Similarly, exporters and rules can be viewed in the Prometheus UI, dashboards in the Grafana UI, and triggered alerts in the Alertmanager UI.
 
-One can also send test alerts to Alertmanager using curl to test routing rules. Alerts tagged "severity": "critical" are currently routed to mock-server, which logs their JSON payload for observability (see mock-server for how to view the logs).
+To test routing rules, which can be confusing, https://prometheus.io/webtools/alerting/routing-tree-editor/ is a good resource. Proper downstream handling of alerts can be tested in an ad hoc manner, as opposed to waiting for a real alert to fire, by sending test alerts to Alertmanager using curl. Alerts tagged "severity": "critical" are currently routed to mock-server, which logs their JSON payload for observability (see mock-server for how to view the logs).
 
 ## Commands
 ```

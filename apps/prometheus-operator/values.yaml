@@ -48,11 +48,14 @@ scrape_endpoints:
   - kube-system
   labels:
     app: node-problem-detector
-  relabelings:
+  targetRelabelings:
   - sourceLabels:
     - __meta_kubernetes_pod_node_name
     targetLabel: nodeName
     action: replace
+  metricRelabelings:
+  - regex: __name__|endpoint|nodeName|reason|service
+    action: labelkeep
 - name: nginx-ingress
   namespaces:
   - default

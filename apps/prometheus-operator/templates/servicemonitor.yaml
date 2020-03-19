@@ -24,8 +24,11 @@ spec:
   {{- if $entry.metricsPath }}
     path: {{ $entry.metricsPath }}
   {{- end }}
-  {{- if $entry.relabelings }}
-    relabelings: {{ toYaml $entry.relabelings | nindent 4 }}
+  {{- if $entry.targetRelabelings }}
+    relabelings: {{ toYaml $entry.targetRelabelings | nindent 4 }}
+  {{- end }}
+  {{- if $entry.metricRelabelings }}
+    metricRelabelings: {{ toYaml $entry.metricRelabelings | nindent 4 }}
   {{- end }}
 ---
 {{ end -}}
