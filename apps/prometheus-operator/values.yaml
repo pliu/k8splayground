@@ -28,6 +28,41 @@ prometheus-operator:
         root_url: http://localhost/grafana
 
   prometheus:
+    additionalServiceMonitors:
+    - name: node-problem-detector
+      namespaceSelector:
+        matchNames:
+        - kube-system
+      selector:
+        matchLabels:
+          app: node-problem-detector
+      endpoints:
+      - port: prom-metrics
+        relabelings:
+        - sourceLabels:
+          - __meta_kubernetes_pod_node_name
+          targetLabel: nodeName
+          action: replace
+        metricRelabelings:
+        - regex: __name__|endpoint|nodeName|reason|service
+          action: labelkeep
+    - name: nginx-ingress
+      namespaceSelector:
+        matchNames:
+        - default
+      selector:
+        matchLabels:
+          app: nginx-ingress
+      endpoints:
+      - port: metrics
+
+    ingress:
+      enabled: true
+      annotations:
+        nginx.ingress.kubernetes.io/rewrite-target: /$2
+      paths:
+      - /prometheus(/|$)(.*)
+
     prometheusSpec:
       externalUrl: prometheus
       ruleSelectorNilUsesHelmValues: false
@@ -37,31 +72,17 @@ prometheus-operator:
         cluster: test
 
   alertmanager:
+    ingress:
+      enabled: true
+      annotations:
+        nginx.ingress.kubernetes.io/rewrite-target: /$2
+      paths:
+      - /alertmanager(/|$)(.*)
+
     alertmanagerSpec:
       externalUrl: http://localhost/alertmanager
       configSecret: alertmanager-config
       logLevel: debug
-
-scrape_endpoints:
-- name: node-problem-detector
-  namespaces:
-  - kube-system
-  labels:
-    app: node-problem-detector
-  targetRelabelings:
-  - sourceLabels:
-    - __meta_kubernetes_pod_node_name
-    targetLabel: nodeName
-    action: replace
-  metricRelabelings:
-  - regex: __name__|endpoint|nodeName|reason|service
-    action: labelkeep
-- name: nginx-ingress
-  namespaces:
-  - default
-  portName: metrics
-  labels:
-    app: nginx-ingress
 
 alertmanagerConfig:
   url: http://mock-server.default.svc.cluster.local/
