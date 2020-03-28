@@ -9,11 +9,11 @@ Grafana is the visualization component of the Prometheus monitoring and alerting
 
 Prometheus Operator automates deployment of the stack by automatically providing the glue that binds the components.
 
-Prometheus' configuration is templated out and configurable through values.yaml. Exporters are configured through ServiceMonitor objects that tie an exporter to the service it is meant to scrape. Similarly, PrometheusRule objects store rules that are imported into the Prometheus instance(s). In this project, ServiceMonitor creation is templated out and can be configured in values.yaml while PrometheusRule creation is automated based on the rules found in rules/. The base Prometheus Operator chart's default rules have been disabled, but its default exporters are enabled and can be configured in values.yaml.
+Prometheus' configuration is templated out and configurable through values.yaml. Exporters are configured through ServiceMonitor objects that tie an exporter to the service it is meant to scrape. Similarly, PrometheusRule objects store rules that aggregated into a ConfigMap object that is mounted by the Prometheus instance(s). In this project, ServiceMonitor creation is templated out and can be configured in values.yaml while PrometheusRule creation is automated based on the rules found in rules/. The base Prometheus Operator chart's default rules have been disabled, but its default exporters are enabled and can be configured in values.yaml.
 
 Alertmanager's configuration (alertmanager/alertmanager.yaml) is rendered into a Secret object which is mounted by the Alertmanager instance(s).
 
-Grafana's configuration can be found in values.yaml. This, along with dashboard and data source configurations, are rendered by the base Prometheus Operator chart into ConfigMap objects which are mounted by Grafana instance(s).
+Grafana's configuration can be found in values.yaml. This is rendered by the base Prometheus Operator chart into a ConfigMap object that is mounted by the Grafana instance(s). ConfigMap objects are automatically created based on the dashboards found in dashboards/ and are imported into the Grafana instance(s). The base Prometheus Operator chart's default dashboards have been disabled.
 
 The cluster configuration (kind/config.yaml) changes the metrics bind address for kube-proxy and etcd from the default 127.0.0.1 to 0.0.0.0 so that their respective exporters can scrape their metrics.
 

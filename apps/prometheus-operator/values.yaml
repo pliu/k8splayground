@@ -16,6 +16,7 @@ prometheus-operator:
 
   grafana:
     adminPassword: password
+
     grafana.ini:
       log:
         mode: console
@@ -26,6 +27,8 @@ prometheus-operator:
         provisioning: /etc/grafana/provisioning
       server:
         root_url: http://localhost/grafana
+
+    defaultDashboardsEnabled: false
 
   prometheus:
     additionalServiceMonitors:
@@ -46,6 +49,7 @@ prometheus-operator:
         metricRelabelings:
         - regex: __name__|endpoint|nodeName|reason|service
           action: labelkeep
+          
     - name: nginx-ingress
       namespaceSelector:
         matchNames:
