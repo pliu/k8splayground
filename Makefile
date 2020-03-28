@@ -11,7 +11,7 @@ kind_destroy:
 
 .PHONY: apply_all
 apply_all: npd_apply mock_apply nginx_apply prometheus_apply
-	echo 'Everything applied'
+	@echo 'Everything applied'
 
 .PHONY: npd_apply
 npd_apply:
@@ -54,3 +54,21 @@ nginx_apply:
 .PHONY: nginx_delete
 nginx_delete:
 	helm uninstall nginx-ingress
+
+.PHONY: conftest_deprek8
+conftest_deprek8:
+	for app_path in $(sort $(dir $(wildcard apps/*/))) ; do \
+	  echo $$app_path; \
+	  helm template $(echo $$app_path | cut -d "/" -f2) $$app_path | conftest test -p conftest-checks/deprek8.rego -; \
+	done
+
+.PHONY: conftest_all
+conftest_all:
+	for check_path in $(wildcard conftest-checks/*.rego) ; do \
+	  echo "*** $$check_path ***"; \
+	  for app_path in $(sort $(dir $(wildcard apps/*/))) ; do \
+	    echo $$app_path; \
+	    helm template $(echo $$app_path | cut -d "/" -f2) $$app_path | conftest test -p $$check_path -; \
+	  done; \
+	  echo '***'; \
+	done

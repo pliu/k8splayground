@@ -30,6 +30,9 @@ prometheus-operator:
 
     defaultDashboardsEnabled: false
 
+    service:
+      port: 9090
+
   prometheus:
     additionalServiceMonitors:
     - name: node-problem-detector
@@ -60,13 +63,6 @@ prometheus-operator:
       endpoints:
       - port: metrics
 
-    ingress:
-      enabled: true
-      annotations:
-        nginx.ingress.kubernetes.io/rewrite-target: /$2
-      paths:
-      - /prometheus(/|$)(.*)
-
     prometheusSpec:
       externalUrl: prometheus
       ruleSelectorNilUsesHelmValues: false
@@ -75,18 +71,16 @@ prometheus-operator:
       externalLabels:
         cluster: test
 
-  alertmanager:
-    ingress:
-      enabled: true
-      annotations:
-        nginx.ingress.kubernetes.io/rewrite-target: /$2
-      paths:
-      - /alertmanager(/|$)(.*)
+    service:
+      port: 9090
 
+  alertmanager:
     alertmanagerSpec:
       externalUrl: http://localhost/alertmanager
       configSecret: alertmanager-config
       logLevel: debug
+    service:
+      port: 9090
 
 alertmanagerConfig:
   url: http://mock-server.default.svc.cluster.local/
