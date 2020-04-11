@@ -18,6 +18,7 @@ You can destroy and recreate the cluster to reset it if during the course of exp
 
 ## Components used in setting up this project
 ```
+docker 19.03.6
 kind 0.7.0 (0.7.0+ is required for disk access)
 helm v3.1.1 (v3+ is required due to folding requirements.yaml into Chart.yaml)
 kubectl 1.17.3

@@ -1,4 +1,5 @@
 CLUSTER_NAME=k8splayground
+RANCHER_CONTAINER_NAME=k8splayground-rancher
 IMAGE=kindest/node:v1.16.4@sha256:b91a2c2317a000f3a783489dfb755064177dbc3a0b2f4147d50f04825d016f55
 
 .PHONY: kind_create
@@ -72,3 +73,13 @@ conftest_all:
 	  done; \
 	  echo '***'; \
 	done
+
+.PHONY: rancher_start
+rancher_start:
+	docker run -d --restart=unless-stopped --name $(RANCHER_CONTAINER_NAME) -p 127.0.0.1:81:80 -p 127.0.0.1:443:443 \
+	rancher/rancher:latest
+	@echo "Docker network IP: $$(docker inspect $(RANCHER_CONTAINER_NAME) -f '{{json .NetworkSettings.Networks.bridge.IPAddress }}')"
+
+.PHONY: rancher_stop
+rancher_stop:
+	docker rm -f $(RANCHER_CONTAINER_NAME)
