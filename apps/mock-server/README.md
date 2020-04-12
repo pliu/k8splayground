@@ -21,7 +21,7 @@ For how ingress works, see the nginx-ingress app's README.
 ## Testing
 The expected behavior of the mock-server is to log the JSON payload after logging the request and to return "You hit: <path the request was directed to>".
 
-If nginx-ingress is running, one can GET or POST to the mock server at localhost:80/mock-server from the local machine.
+If nginx-ingress is running, one can GET or POST to the mock server at http://localhost:80/mock-server from the local machine.
 
 Finally, mock server also logs the signal it receives from Kubernetes when being terminated.
 

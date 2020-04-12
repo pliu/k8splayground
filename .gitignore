@@ -1,2 +1,6 @@
 charts/
 *.lock
+*.csr
+*.crt
+*.key
+auth/config/

@@ -22,7 +22,7 @@ docker 19.03.6
 kind 0.7.0 (0.7.0+ is required for disk access)
 helm v3.1.1 (v3+ is required due to folding requirements.yaml into Chart.yaml)
 kubectl 1.17.3
-promtool (for Prometheus operator alerting rules' unit tests)
+promtool (for Prometheus operator rules' tests)
 conftest 0.17.1 (for checking Helm-generated manifests against Rego rules)
 ```
 
@@ -37,6 +37,10 @@ root
 |  |- templates?
 |  |  |- ...
 |  |- values.yaml?
+|- auth
+|  |- config
+|  |- scripts
+|  |- README.md
 |- conftest-checks
 |  |- deprek8.rego
 |  |- README.md
@@ -54,9 +58,11 @@ mock server
 ```
 Each app folder contains, at the very least its own README, with more information on what the app does and how to use it, and Chart.yaml. The Chart.yaml contains some basic metadata about the chart (the package of Kubernetes manifests that defines the Kubernetes objects required to deploy the app) such as name, version, and any dependencies. In addition, it may contain a templates folder that contains the templates from which the actual manifests are rendered. The values used in the rendering are found in the values.yaml file. If none of the templates require rendering, then no values.yaml is needed (e.g. mock-server). If including another chart as a dependency, one can configure the imported chart using the values.yaml file (e.g. prometheus-operator, nginx-ingress).
 
+auth contains documentation and tools to learn about authentication and authorization in Kubernetes and Rancher, an external cluster manager. The scripts folder contains helper scripts related to user creation and permissioning through Kubernetes and accessing Kubernetes directly as these newly-created users. The config folder contains the kubeconfig files for these users.
+
 conftest-checks contains a suite of Rego rules against which Helm-generated manifests should be checked for correctness.
 
-The Makefile contains targets for creating and destroying the cluster, applying and deleting the various apps, and other helpers (e.g. running Prometheus rule unit tests). The app application targets are written to create the app if it doesn't exist and to update it otherwise.
+The Makefile contains targets for creating and destroying the cluster, applying and deleting the various apps, and other helpers (e.g. running Prometheus rule tests). The app apply targets are written to create the app if it doesn't exist and to update it otherwise.
 
 ## Commands
 ```

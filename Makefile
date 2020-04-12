@@ -3,11 +3,11 @@ RANCHER_CONTAINER_NAME=k8splayground-rancher
 IMAGE=kindest/node:v1.16.4@sha256:b91a2c2317a000f3a783489dfb755064177dbc3a0b2f4147d50f04825d016f55
 
 .PHONY: kind_create
-kind_create:
+kind_create: users_clear
 	kind create cluster --config=kind/config.yaml --name $(CLUSTER_NAME) --image $(IMAGE)
 
 .PHONY: kind_destroy
-kind_destroy:
+kind_destroy: users_clear
 	kind delete cluster --name $(CLUSTER_NAME)
 
 .PHONY: apply_all
@@ -35,6 +35,7 @@ prometheus_delete:
 
 .PHONY: prometheus_test_rules
 prometheus_test_rules:
+	find apps/prometheus-operator/rules -type f -name '*.yaml' -not -name '*_test.yaml' -exec promtool check rules {} +
 	find apps/prometheus-operator/rules -type f -name '*_test.yaml' -exec promtool test rules {} +
 
 .PHONY: mock_apply
@@ -76,10 +77,35 @@ conftest_all:
 
 .PHONY: rancher_start
 rancher_start:
-	docker run -d --restart=unless-stopped --name $(RANCHER_CONTAINER_NAME) -p 127.0.0.1:81:80 -p 127.0.0.1:443:443 \
-	rancher/rancher:latest
+	docker run -d --restart=unless-stopped --name $(RANCHER_CONTAINER_NAME) -p 127.0.0.1:443:443 rancher/rancher:latest
 	@echo "Docker network IP: $$(docker inspect $(RANCHER_CONTAINER_NAME) -f '{{json .NetworkSettings.Networks.bridge.IPAddress }}')"
 
 .PHONY: rancher_stop
 rancher_stop:
 	docker rm -f $(RANCHER_CONTAINER_NAME)
+
+.PHONY: user_create
+user_create:
+	auth/scripts/create_user.sh $(USER) $(GROUPS)
+
+.PHONY: users_clear
+users_clear:
+	-rm auth/config/*
+
+.PHONY: permissions_apply
+permissions_apply:
+ifdef NAMESPACE
+  ifdef USERS
+	auth/scripts/read_only_permissions.sh $(NAMESPACE) $(USERS) User
+  else ifdef GROUPS
+	auth/scripts/read_only_permissions.sh $(NAMESPACE) $(GROUPS) Group
+  else
+	@echo 'Must set either USERS or GROUPS'
+  endif
+else
+	@echo 'Must set NAMESPACE'
+endif
+
+.PHONY: permissions_delete
+permissions_delete:
+	kubectl delete rolebindings -A -l k8splayground-selector=permissions
