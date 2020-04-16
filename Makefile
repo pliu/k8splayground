@@ -78,7 +78,7 @@ conftest_all:
 .PHONY: rancher_start
 rancher_start:
 	docker run -d --restart=unless-stopped --name $(RANCHER_CONTAINER_NAME) -p 127.0.0.1:443:443 rancher/rancher:latest
-	@echo "Docker network IP: $$(docker inspect $(RANCHER_CONTAINER_NAME) -f '{{json .NetworkSettings.Networks.bridge.IPAddress }}')"
+	@echo "Docker network IP: $$(docker inspect $(RANCHER_CONTAINER_NAME) -f '{{ json .NetworkSettings.Networks.bridge.IPAddress }}')"
 
 .PHONY: rancher_stop
 rancher_stop:

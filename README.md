@@ -1,5 +1,4 @@
 # K8sPlayground
-
 K8sPlayground is a kind-based (Kubernetes in Docker) environment built to facilitate experimentation with a tight feedback loop, thus accelerating learning and understanding of k8s, related tooling, and k8s apps.
 
 As its name suggests, kind works by spinning up Docker containers to act as "hosts" in a Kubernetes cluster. These Docker "hosts" are subsequently managed by kubeadm to set up Kubernetes components (e.g., kubelet, etcd, api-server, controller-manager, scheduler, kindnet [CNI implementation], coreDNS, kube-proxy).
@@ -13,6 +12,7 @@ Examples of things to experiment with:
 - the effect of deleting hosts (Docker "hosts", in this case)
 - how Helm works
 - how kubeadm works
+- explore various kubectl plugins
 
 You can destroy and recreate the cluster to reset it if during the course of experimentation the cluster gets into a bad state - a major benefit of having such a local test environment.
 
@@ -24,6 +24,7 @@ helm v3.1.1 (v3+ is required due to folding requirements.yaml into Chart.yaml)
 kubectl 1.17.3
 promtool (for Prometheus operator rules' tests)
 conftest 0.17.1 (for checking Helm-generated manifests against Rego rules)
+kubectl-krew v0.3.4 (for installing kubectl plugins)
 ```
 
 ## Repository structure
@@ -80,6 +81,18 @@ make conftest_all
 
 Check which apps are currently deployed:
 helm list --all-namespaces
+
+Discover kubectl plugins:
+kubectl krew update && kubectl krew search
+
+Install kubectl plugin:
+kubectl krew install <plugin name>
+
+List installed kubectl plugins:
+kubectl krew list
+
+Uninstall kubectl plugin:
+kubectl krew uninstall <plugin name>
 
 Get a shell into a Docker "host":
 docker exec -it <container name [`docker ps` to find it]> /bin/bash

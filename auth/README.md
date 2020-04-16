@@ -22,7 +22,7 @@ Unfortunately, many of the steps to set up Rancher must be done through its UI, 
 
 1. Start the Rancher server. Note down its Docker network IP. If you forgot to do this, you can find it later by running
 ```
-docker inspect <container name> -f '{{json .NetworkSettings.Networks.bridge.IPAddress }}'
+docker inspect <container name> -f '{{ json .NetworkSettings.Networks.bridge.IPAddress }}'
 ```
 2. Go to its UI (https://localhost:443) and set an admin password
 3. Set the Rancher Server URL to be the Rancher Docker network IP from step 1 (the Rancher container sits in the same network as the kind "hosts" and this is its IP within that network, thus allowing the kind "hosts" to connect to it)
@@ -66,6 +66,8 @@ NAME                                                      READY   STATUS    REST
 ...
 ```
 It is recommended to examine auth/scripts/create_user.sh and auth/scripts/read_only_permissions.sh, called by make create_user and make permissions_apply, respectively, to understand how client certificates and kubeconfigs are generated and to see an example of RoleBinding. In the case of role binding, instead of creating and binding a custom role, we bind the "view" role that comes with Kubernetes.
+
+who-can is an extremely useful kubectl plugin for exploring which users, groups, and service accounts have permitted to execute any given command. It also shows the RoleBindings/ClusterRoleBindings responsible for binding the permission to these entities.
 
 ## Creating and testing a user through Rancher
 Use the following flows to test creation of new users, granting them permissions, and accessing Kubernetes through Rancher (similar to setting up Rancher, many of these steps must be done through Rancher's UI and thus do not have Makefile targets like those in the previous section).
@@ -119,4 +121,7 @@ make permissions_delete
 
 Access Kubernetes directly as a user:
 auth/scripts/user_kubectl.sh <username> <kubectl command>
+
+Query which users, groups, and service accounts are permitted to execute a given command:
+kubectl who-can <kubectl command>
 ```
