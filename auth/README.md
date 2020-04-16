@@ -16,7 +16,7 @@ Role-based access control (RBAC) is the most popular authorization model used by
 ## Rancher
 Rancher is a Kubernetes cluster manager. It can be used to launch new Kubernetes clusters, manage existing ones (explore Kubernetes in manner similar to kubectl but graphically), deploy and manage applications via Helm charts, monitor, alert, and aggregate logs across clusters, and provides user and group management and authorization capabilities. We will use Rancher primarily for its user management and authorization capabilities as group management requires external identity providers, we use Helm directly to deploy and manage applications, and we use Prometheus Operator for monitoring and alerting.
 
-We run Rancher in a Docker container alongside the kind "hosts". When creating the Rancher container, we port-forward localhost:443 on the local machine to port 443 on the Rancher container (specified in the Makefile), allowing us to access the Rancher UI.
+We run Rancher in a Docker container alongside the kind "hosts". When creating the Rancher container, we port-forward localhost:444 on the local machine to port 443 on the Rancher container (specified in the Makefile), allowing us to access the Rancher UI.
 
 Unfortunately, many of the steps to set up Rancher must be done through its UI, which is why there are no Makefile targets to execute them. To import the kind cluster into Rancher:
 
@@ -24,7 +24,7 @@ Unfortunately, many of the steps to set up Rancher must be done through its UI, 
 ```
 docker inspect <container name> -f '{{ json .NetworkSettings.Networks.bridge.IPAddress }}'
 ```
-2. Go to its UI (https://localhost:443) and set an admin password
+2. Go to its UI (https://localhost:444) and set an admin password
 3. Set the Rancher Server URL to be the Rancher Docker network IP from step 1 (the Rancher container sits in the same network as the kind "hosts" and this is its IP within that network, thus allowing the kind "hosts" to connect to it)
 4. Add Cluster -> Import an existing cluster -> give the cluster a name -> Create
 5. Run the 'curl --insecure' command to add the cluster
@@ -72,7 +72,7 @@ who-can is an extremely useful kubectl plugin for exploring which users, groups,
 ## Creating and testing a user through Rancher
 Use the following flows to test creation of new users, granting them permissions, and accessing Kubernetes through Rancher (similar to setting up Rancher, many of these steps must be done through Rancher's UI and thus do not have Makefile targets like those in the previous section).
 
-Each of the following flows starts from the "Global" view (https://localhost:443/g/clusters).
+Each of the following flows starts from the "Global" view (https://localhost:444/g/clusters).
 ```
 Add/delete users:
 Security -> Users -> Add User

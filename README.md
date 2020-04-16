@@ -3,7 +3,7 @@ K8sPlayground is a kind-based (Kubernetes in Docker) environment built to facili
 
 As its name suggests, kind works by spinning up Docker containers to act as "hosts" in a Kubernetes cluster. These Docker "hosts" are subsequently managed by kubeadm to set up Kubernetes components (e.g., kubelet, etcd, api-server, controller-manager, scheduler, kindnet [CNI implementation], coreDNS, kube-proxy).
 
-When the cluster is started, localhost:80 will be mapped to one of the Docker worker "hosts" (specified in kind/config.yaml).
+When the cluster is started, localhost ports 80 and 443 will be mapped to one of the Docker worker "hosts" (specified in kind/config.yaml).
 
 Examples of things to experiment with:
 
@@ -53,6 +53,7 @@ The kind folder contains the cluster configuration (config.yaml).
 Current apps include:
 ```
 NGINX Ingress
+Argo CD
 Prometheus Operator
 node-problem-detector
 mock server
@@ -65,6 +66,9 @@ conftest-checks contains a suite of Rego rules against which Helm-generated mani
 
 The Makefile contains targets for creating and destroying the cluster, applying and deleting the various apps, and other helpers (e.g. running Prometheus rule tests). The app apply targets are written to create the app if it doesn't exist and to update it otherwise.
 
+## Deployment
+
+
 ## Commands
 ```
 Create the k8s cluster:
@@ -73,14 +77,14 @@ make kind_create
 Destroy the k8s cluster:
 make kind_destroy
 
-Apply all apps:
+Apply all apps with Helm (except Argo CD):
 make apply_all
+
+Check which apps are currently applied with Helm:
+helm list --all-namespaces
 
 Run all conftest checks:
 make conftest_all
-
-Check which apps are currently deployed:
-helm list --all-namespaces
 
 Discover kubectl plugins:
 kubectl krew update && kubectl krew search

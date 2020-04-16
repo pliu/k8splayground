@@ -9,4 +9,4 @@ nginx-ingress:
       type: NodePort
       nodePorts:
         http: "30000"
-      enableHttps: false
+        https: "30001"

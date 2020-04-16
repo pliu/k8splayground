@@ -38,10 +38,13 @@ prometheus_test_rules:
 	find apps/prometheus-operator/rules -type f -name '*.yaml' -not -name '*_test.yaml' -exec promtool check rules {} +
 	find apps/prometheus-operator/rules -type f -name '*_test.yaml' -exec promtool test rules {} +
 
-.PHONY: mock_apply
-mock_apply:
+.PHONY: mock_build
+mock_build:
 	docker build -t mock-server:0.0.1 apps/mock-server/server
 	kind load docker-image mock-server:0.0.1 --name $(CLUSTER_NAME)
+
+.PHONY: mock_apply
+mock_apply: mock_build
 	helm install mock-server apps/mock-server || helm upgrade mock-server apps/mock-server
 
 .PHONY: mock_delete
@@ -77,7 +80,7 @@ conftest_all:
 
 .PHONY: rancher_start
 rancher_start:
-	docker run -d --restart=unless-stopped --name $(RANCHER_CONTAINER_NAME) -p 127.0.0.1:443:443 rancher/rancher:latest
+	docker run -d --restart=unless-stopped --name $(RANCHER_CONTAINER_NAME) -p 127.0.0.1:444:443 rancher/rancher:latest
 	@echo "Docker network IP: $$(docker inspect $(RANCHER_CONTAINER_NAME) -f '{{ json .NetworkSettings.Networks.bridge.IPAddress }}')"
 
 .PHONY: rancher_stop
@@ -109,3 +112,19 @@ endif
 .PHONY: permissions_delete
 permissions_delete:
 	kubectl delete rolebindings -A -l k8splayground-selector=permissions
+
+.PHONY: argo_apply
+argo_apply:
+	-kubectl create namespace argo-cd
+	helm install -n argo-cd argo-cd apps/argo-cd || helm upgrade -n argo-cd argo-cd apps/argo-cd
+	make argo_apps
+	@echo "Argo CD admin password: $$(kubectl get pods -n argo-cd -l app.kubernetes.io/name=argocd-server -o name | cut -d'/' -f 2)"
+
+.PHONY: argo_apps
+argo_apps: mock_build
+	helm install -n argo-cd argo-apps apps/argo-apps || helm upgrade -n argo-cd argo-apps apps/argo-apps
+
+.PHONY: argo_delete
+argo_delete:
+	helm uninstall -n argo-cd argo-cd
+	kubectl delete namespace argo-cd

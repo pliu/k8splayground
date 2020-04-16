@@ -1,0 +1,31 @@
+{{- range $project_name, $project := .Values.projects -}}
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: {{ $project_name }}
+spec:
+  description: {{ required (printf "%s needs a description" $project_name) $project.description }}
+  {{- if $project.whitelistedGitRepos }}
+  sourceRepos: {{ $project.whitelistedGitRepos | toYaml | nindent 2 }}
+  {{- end }}
+  {{- if $project.whitelistedNamespaces }}
+  destinations:
+    {{- range $namespace := $project.whitelistedNamespaces }}
+  - namespace: {{ $namespace }}
+    server: https://kubernetes.default.svc
+    {{- end }}
+  {{- end }}
+  {{- if $project.whitelistedClusterResources }}
+  clusterResourceWhitelist: {{ $project.whitelistedClusterResources | toYaml | nindent 2 }}
+  {{- end }}
+  {{- if $project.whitelistedNamespacedResources }}
+  namespaceResourceWhitelist: {{ $project.whitelistedNamespacedResources | toYaml | nindent 2 }}
+  {{- else if $project.blacklistedNamespacedResources }}
+  namespaceResourceBlacklist: {{ $project.blacklistedNamespacedResources | toYaml | nindent 2 }}
+  {{- end }}
+  {{- if $project.monitorOrphanedResources }}
+  orphanedResources:
+    warn: true
+  {{- end }}
+---
+{{- end }}

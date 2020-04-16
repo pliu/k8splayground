@@ -2,15 +2,9 @@ kind: Service
 apiVersion: v1
 metadata:
   name: {{ .Release.Name }}
-  labels:
-{{- range $key, $value := .Values.labels }}
-    {{ $key }}: {{ $value }}
-{{- end }}
+  labels: {{ .Values.labels | toYaml | nindent 4 }}
 spec:
-  selector:
-{{- range $key, $value := .Values.labels }}
-    {{ $key }}: {{ $value }}
-{{- end }}
+  selector: {{ .Values.labels | toYaml | nindent 4 }}
   ports:
   - name: prom-metrics
     port: {{ .Values.metrics_port }}

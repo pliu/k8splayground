@@ -52,6 +52,33 @@ prometheus-operator:
         metricRelabelings:
         - regex: __name__|endpoint|nodeName|reason|service
           action: labelkeep
+    - name: argocd-server
+      namespaceSelector:
+        matchNames:
+        - argo-cd
+      selector:
+        matchLabels:
+          app.kubernetes.io/name: argocd-server-metrics
+      endpoints:
+      - port: metrics
+    - name: argocd-repo-server
+      namespaceSelector:
+        matchNames:
+        - argo-cd
+      selector:
+        matchLabels:
+          app.kubernetes.io/name: argocd-repo-server
+      endpoints:
+      - port: metrics
+    - name: argocd
+      namespaceSelector:
+        matchNames:
+        - argo-cd
+      selector:
+        matchLabels:
+          app.kubernetes.io/name: argocd-metrics
+      endpoints:
+      - port: metrics
           
     - name: nginx-ingress
       namespaceSelector:
@@ -81,6 +108,12 @@ prometheus-operator:
       logLevel: debug
     service:
       port: 9090
+
+  prometheusOperator:
+    admissionWebhooks:
+      enabled: false
+    tlsProxy:
+      enabled: false
 
 alertmanagerConfig:
   url: http://mock-server.default.svc.cluster.local/

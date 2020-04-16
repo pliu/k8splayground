@@ -4,16 +4,10 @@ metadata:
   name: {{ .Release.Name }}
 spec:
   selector:
-    matchLabels:
-{{- range $key, $value := .Values.labels }}
-      {{ $key }}: {{ $value }}
-{{- end }}
+    matchLabels: {{ .Values.labels | toYaml | nindent 6 }}
   template:
     metadata:
-      labels:
-{{- range $key, $value := .Values.labels }}
-        {{ $key }}: {{ $value }}
-{{- end }}
+      labels: {{ .Values.labels | toYaml | nindent 8 }}
     spec:
       tolerations:
       - key: playground_test
@@ -35,7 +29,6 @@ spec:
           requests:
             cpu: 10m
             memory: 80Mi
-        imagePullPolicy: Always
         securityContext:
           privileged: true
         env:
