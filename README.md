@@ -66,7 +66,7 @@ conftest-checks contains a suite of Rego rules against which Helm-generated mani
 
 The Makefile contains targets for creating and destroying the cluster, applying and deleting the various apps, and other helpers (e.g. running Prometheus rule tests). The app apply targets are written to create the app if it doesn't exist and to update it otherwise.
 
-## Deployment
+## Application deployment
 
 
 ## Commands

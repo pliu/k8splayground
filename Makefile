@@ -16,12 +16,12 @@ apply_all: npd_apply mock_apply nginx_apply prometheus_apply
 
 .PHONY: npd_apply
 npd_apply:
-	helm install node-problem-detector apps/node-problem-detector --namespace kube-system || helm upgrade node-problem-detector \
-	apps/node-problem-detector --namespace kube-system
+	helm install node-problem-detector apps/node-problem-detector -n kube-system || helm upgrade node-problem-detector \
+	apps/node-problem-detector -n kube-system
 
 .PHONY: npd_delete
 npd_delete:
-	helm uninstall node-problem-detector --namespace kube-system
+	helm uninstall node-problem-detector --n kube-system
 
 .PHONY: prometheus_apply
 prometheus_apply:
@@ -54,11 +54,11 @@ mock_delete:
 .PHONY: nginx_apply
 nginx_apply:
 	helm dependency update apps/nginx-ingress
-	helm install nginx-ingress apps/nginx-ingress || helm upgrade nginx-ingress apps/nginx-ingress
+	helm install nginx-ingress apps/nginx-ingress -n kube-system || helm upgrade nginx-ingress apps/nginx-ingress -n kube-system
 
 .PHONY: nginx_delete
 nginx_delete:
-	helm uninstall nginx-ingress
+	helm uninstall nginx-ingress -n kube-system
 
 .PHONY: conftest_deprek8
 conftest_deprek8:
@@ -117,11 +117,9 @@ permissions_delete:
 argo_apply:
 	-kubectl create namespace argo-cd
 	helm install -n argo-cd argo-cd apps/argo-cd || helm upgrade -n argo-cd argo-cd apps/argo-cd
-	make argo_apps
-	@echo "Argo CD admin password: $$(kubectl get pods -n argo-cd -l app.kubernetes.io/name=argocd-server -o name | cut -d'/' -f 2)"
 
-.PHONY: argo_apps
-argo_apps: mock_build
+.PHONY: apps_apply
+apps_apply: mock_build
 	helm install -n argo-cd argo-apps apps/argo-apps || helm upgrade -n argo-cd argo-apps apps/argo-apps
 
 .PHONY: argo_delete

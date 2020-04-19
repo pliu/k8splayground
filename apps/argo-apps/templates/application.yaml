@@ -6,9 +6,9 @@ metadata:
   name: {{ $project_name }}-{{ $application_name }}
 spec:
   project: {{ $project_name }}
-    {{- if $application.source }}
   source: {{ $application.source | toYaml | nindent 4 }}
-    {{- end }}
+    helm:
+      releaseName: {{ $application_name }}
   destination:
     server: https://kubernetes.default.svc
     namespace: {{ required (printf "%s in %s needs a namespace" $application_name $project_name) $application.namespace }}
@@ -17,9 +17,9 @@ spec:
       prune: true # Specifies if resources should be pruned during auto-syncing ( false by default ).
       selfHeal: true # Specifies if partial app sync should be executed when resources are changed only in target Kubernetes cluster and no git change detected ( false by default ).
     validate: true # Validate resources before applying to k8s, defaults to true.
-  {{- if $application.ignoreDifferences }}
+    {{- if $application.ignoreDifferences }}
   ignoreDifferences: {{ $application.ignoreDifferences | toYaml | nindent 2 }}
-  {{- end }}
+    {{- end }}
 ---
   {{- end }}
 {{- end }}

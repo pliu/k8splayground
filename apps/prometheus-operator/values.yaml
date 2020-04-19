@@ -52,6 +52,15 @@ prometheus-operator:
         metricRelabelings:
         - regex: __name__|endpoint|nodeName|reason|service
           action: labelkeep
+    - name: nginx-ingress
+      namespaceSelector:
+        matchNames:
+        - kube-system
+      selector:
+        matchLabels:
+          app: nginx-ingress
+      endpoints:
+      - port: metrics
     - name: argocd-server
       namespaceSelector:
         matchNames:
@@ -77,16 +86,6 @@ prometheus-operator:
       selector:
         matchLabels:
           app.kubernetes.io/name: argocd-metrics
-      endpoints:
-      - port: metrics
-          
-    - name: nginx-ingress
-      namespaceSelector:
-        matchNames:
-        - default
-      selector:
-        matchLabels:
-          app: nginx-ingress
       endpoints:
       - port: metrics
 

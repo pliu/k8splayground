@@ -5,6 +5,11 @@ metadata:
     app.kubernetes.io/name: argocd-cm
     app.kubernetes.io/part-of: argocd
   name: argocd-cm
+data:
+  application.instanceLabelKey: argo-cd/app
+{{- range $user := .Values.users }}
+  accounts.{{ $user }}: login
+{{- end }}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -13,6 +18,11 @@ metadata:
     app.kubernetes.io/name: argocd-rbac-cm
     app.kubernetes.io/part-of: argocd
   name: argocd-rbac-cm
+data:
+  policy.default: role:readonly
+{{- if .Values.policy }}
+  policy.csv: | {{ .Values.policy | nindent 4 }}
+{{- end }}
 ---
 apiVersion: v1
 data:

@@ -1,7 +1,10 @@
 # Argo CD
 
 
-## Argo Apps
+## Argo apps
+
+
+## Authorization
 
 
 ## Testing
@@ -13,7 +16,7 @@ Apply/update Argo CD:
 make argo_apply
 
 Apply/update Argo CD-managed applications:
-make argo_apps
+make apps_apply
 
 Delete Argo CD:
 make argo_delete

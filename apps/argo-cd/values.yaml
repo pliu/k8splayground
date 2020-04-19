@@ -1,0 +1,11 @@
+password: $2a$10$2vdbT/e8lptKEXvRCU1xo.M7bcPhHPjin9IvLOzOe4ALXnPsWAibm
+users:
+- user
+policy: |
+  p, role:apps-ops, applications, delete, apps/*, allow
+  p, role:apps-ops, applications, get, apps/*, allow
+  p, role:apps-ops, applications, override, apps/*, allow
+  p, role:apps-ops, applications, sync, apps/*, allow
+  p, role:apps-ops, applications, update, apps/*, allow
+  p, role:apps-ops, projects, get, apps, allow
+  g, user, role:apps-ops

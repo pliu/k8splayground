@@ -1,4 +1,3 @@
-{{- $root := . -}}
 {{- range $path, $bytes := .Files.Glob "dashboards/**.json" -}}
   {{- $filename := base (trimSuffix ".json" $path) | camelcase | lower -}}
 apiVersion: v1
@@ -8,6 +7,6 @@ metadata:
     grafana_dashboard: "1"
   name: {{ $filename }}-dashboard
 data: 
-  {{ $filename }}.json: |- {{ $root.Files.Get $path | nindent 4 }}
+  {{ $filename }}.json: |- {{ $.Files.Get $path | nindent 4 }}
 ---
 {{ end -}}
