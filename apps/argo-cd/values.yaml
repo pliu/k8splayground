@@ -1,3 +1,4 @@
+# password is the bcrypt hash of the actual password, 'password'
 password: $2a$10$2vdbT/e8lptKEXvRCU1xo.M7bcPhHPjin9IvLOzOe4ALXnPsWAibm
 users:
 - user

@@ -7,6 +7,6 @@ Current checks include:
 
 ## Commands
 ```
-Check all apps for use of deprecated k8s APIs:
+Check all applications for use of deprecated k8s APIs:
 make conftest_deprek8
 ```

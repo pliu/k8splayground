@@ -3,10 +3,11 @@ Authentication and authorization are crucial components in most production syste
 
 Examples of things to experiment with:
 
-- creating new users and groups
-- creating namespaced and global custom roles
-- granting namedspaced and global permissions to users and groups via role bindings
-- play around with the Rancher's other capabilities
+- "creating" Kubernetes users and groups
+- creating new Rancher users
+- creating namespaced and cluster-wide custom roles through Kubernetes or Rancher
+- granting namedspaced and cluster-wide permissions to users and groups via role bindings through Kubernetes or Rancher
+- play around with Rancher's other capabilities
 
 ## Kubernetes' authentication and authorization model
 Kubernetes has two primary ways to identify clients: "users" and service accounts ("users" are used by external clients whereas service accounts are used by services internal to Kubernetes). Users are not explicitly represented as a Kubernetes objects but are instead implicitly derived from the Common Name field in the subject of the Kubernetes-signed certificate a client uses to authenticate with the cluster. Group membership is similarly implicit and found in the Organization fields.
@@ -116,7 +117,7 @@ make users_clear
 Apply read-only permissions for users/groups in a given namespace:
 NAMESPACE=<namespace> [USERS=<comma-separated list of users> GROUPS=<comma-separated list of groups>; one is required] make permissions_apply
 
-Delete all k8splayground-applied permissions:
+Delete all K8sPlayground-applied permissions:
 make permissions_delete
 
 Access Kubernetes directly as a user:

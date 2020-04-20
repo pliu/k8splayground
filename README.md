@@ -1,5 +1,5 @@
 # K8sPlayground
-K8sPlayground is a kind-based (Kubernetes in Docker) environment built to facilitate experimentation with a tight feedback loop, thus accelerating learning and understanding of k8s, related tooling, and k8s apps.
+K8sPlayground is a kind-based (Kubernetes in Docker) environment built to facilitate experimentation with a tight feedback loop, thus accelerating learning and understanding of k8s, related tooling, and k8s applications.
 
 As its name suggests, kind works by spinning up Docker containers to act as "hosts" in a Kubernetes cluster. These Docker "hosts" are subsequently managed by kubeadm to set up Kubernetes components (e.g., kubelet, etcd, api-server, controller-manager, scheduler, kindnet [CNI implementation], coreDNS, kube-proxy).
 
@@ -50,37 +50,40 @@ root
 ```
 The kind folder contains the cluster configuration (config.yaml).
 
-Current apps include:
-```
-NGINX Ingress
-Argo CD
-Prometheus Operator
-node-problem-detector
-mock server
-```
-Each app folder contains, at the very least its own README, with more information on what the app does and how to use it, and Chart.yaml. The Chart.yaml contains some basic metadata about the chart (the package of Kubernetes manifests that defines the Kubernetes objects required to deploy the app) such as name, version, and any dependencies. In addition, it may contain a templates folder that contains the templates from which the actual manifests are rendered. The values used in the rendering are found in the values.yaml file. If none of the templates require rendering, then no values.yaml is needed (e.g. mock-server). If including another chart as a dependency, one can configure the imported chart using the values.yaml file (e.g. prometheus-operator, nginx-ingress).
+Current applications include:
+- [NGINX Ingress](apps/nginx-ingress/README.md)
+- [Argo CD](apps/argo-cd/README.md)
+- [Prometheus Operator](apps/prometheus-operator/README.md)
+- [node-problem-detector](apps/node-problem-detector/README.md)
+- [mock server](apps/mock-server/README.md)
 
-auth contains documentation and tools to learn about authentication and authorization in Kubernetes and Rancher, an external cluster manager. The scripts folder contains helper scripts related to user creation and permissioning through Kubernetes and accessing Kubernetes directly as these newly-created users. The config folder contains the kubeconfig files for these users.
+Each application folder contains, at the very least its own README, with more information on what the application does and how to use it, and Chart.yaml. The Chart.yaml contains some basic metadata about the chart (the package of Kubernetes manifests that defines the Kubernetes objects required to deploy the application) such as name, version, and any dependencies. In addition, it may contain a templates folder that contains the templates from which the actual manifests are rendered. The values used in the rendering are found in the values.yaml file. If none of the templates require rendering, then no values.yaml is needed (e.g. mock-server). If including another chart as a dependency, one can configure the imported chart using the values.yaml file (e.g. prometheus-operator, nginx-ingress).
 
-conftest-checks contains a suite of Rego rules against which Helm-generated manifests should be checked for correctness.
+auth contains documentation and tools to learn about authentication and authorization in Kubernetes and Rancher, an external cluster manager. The scripts folder contains helper scripts related to user creation and permissioning through Kubernetes and accessing Kubernetes directly as these newly-created users. The config folder contains the kubeconfig files for these users. Documentation can be found [here](auth/README.md).
 
-The Makefile contains targets for creating and destroying the cluster, applying and deleting the various apps, and other helpers (e.g. running Prometheus rule tests). The app apply targets are written to create the app if it doesn't exist and to update it otherwise.
+conftest-checks contains a suite of Rego rules against which Helm-generated manifests should be checked for correctness. Documentation can be found [here](conftest-checks/README.md).
+
+The Makefile contains targets for creating and destroying the cluster, applying and deleting the various applications, and other helpers (e.g. running Prometheus rule tests).
 
 ## Application deployment
+There are two ways to deploy applications in K8sPlayground: Helm and Argo CD. The two methods, as set up in this project, are mutually exclusive as they are configured to deploy the same applications with the same names in the same namespaces. 
 
+The Makefile targets for applying/deleting applications found in the READMEs of the various applications use Helm-driven deployment. These targets are written to create the application if it doesn't exist and to update it otherwise.
+
+The Argo CD Makefile targets are no different and use Helm to apply/delete Argo CD, which subsequently deploys other applications. For more information on how to manage Argo CD-driven application deployment, see Argo CD's README.
 
 ## Commands
 ```
-Create the k8s cluster:
+Create kind cluster:
 make kind_create
 
-Destroy the k8s cluster:
+Destroy kind cluster:
 make kind_destroy
 
-Apply all apps with Helm (except Argo CD):
+Apply all applications with Helm (except argo-cd and argo-apps):
 make apply_all
 
-Check which apps are currently applied with Helm:
+Check which applications are currently applied with Helm:
 helm list --all-namespaces
 
 Run all conftest checks:

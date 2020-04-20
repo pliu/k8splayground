@@ -17,7 +17,7 @@ Grafana's configuration can be found in values.yaml. This is rendered by the bas
 
 The cluster configuration (kind/config.yaml) changes the metrics bind address for kube-proxy and etcd from the default 127.0.0.1 to 0.0.0.0 so that their respective exporters can scrape their metrics.
 
-The convention for this project is for apps that wish to expose metrics via endpoints to define their Service manifests in their own app but to define their ServiceMonitor manifests in the values file of the prometheus-operator app (e.g., nginx-ingress, node-problem-detector). This is because ServiceMonitor is a Custom Resource created by the prometheus-operator app and thus would otherwise impose ordering on app deployment. The metrics Services have no effect in the absence of their respective ServiceMonitor objects.
+The convention for this project is for applications that wish to expose metrics via endpoints to define their Service manifests in their own application but to define their ServiceMonitor manifests in the values file of the prometheus-operator application (e.g., nginx-ingress, node-problem-detector). This is because ServiceMonitor is a Custom Resource created by the prometheus-operator application and thus would otherwise impose ordering on application deployment. The metrics Services have no effect in the absence of their respective ServiceMonitor objects.
 
 Examples of things to experiment with:
 

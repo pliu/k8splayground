@@ -1,8 +1,8 @@
 # Mock Server
 Mock server currently serves four purposes:
 
-- It provides a POST REST endpoint that can be called by other services. It then dumps the JSON payload into its logs. This can be used for debugging whether a webhook has been called and can also be used to inspect the schema of the payload.
-- It is an example of how to package an app into a Docker image, upload it to the kind cluster, deploy it using a deployment, and serve it from a service
+- It provides a REST endpoint for GET and POST requests that can be called by other services. It then dumps the JSON payload into its logs. This can be used for debugging whether a webhook has been called and can also be used to inspect the schema of the payload.
+- It is an example of how to package an application into a Docker image, upload it to the kind cluster, deploy it using a deployment, and serve it from a service
 - It is an example of how Kubernetes signals to applications within a pod that is about to be terminated (it sends SIGTERM and then waits for a configurable grace period)
 - It is an example of using selectors to restrict the nodes that pods can be scheduled on
 
@@ -16,7 +16,7 @@ Examples of things to experiment with:
 - how the Dockerfile definition translates to layers in a Docker image and the effect of layers (requires changing the Makefile)
 - how to handle SIGTERM and gracefully shutdown an application
 
-For how ingress works, see the nginx-ingress app's README.
+For how ingress works, see the nginx-ingress application's README.
 
 ## Testing
 The expected behavior of the mock-server is to log the JSON payload after logging the request and to return "You hit: <path the request was directed to>".
