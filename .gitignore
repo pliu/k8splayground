@@ -1,3 +1,6 @@
 charts/
 *.lock
 auth/config/
+.terraform/
+token
+auth/terraform/manage/main.tf

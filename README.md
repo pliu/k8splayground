@@ -25,26 +25,37 @@ kubectl 1.17.3
 promtool (for Prometheus operator rules' tests)
 conftest 0.17.1 (for checking Helm-generated manifests against Rego rules)
 kubectl-krew v0.3.4 (for installing kubectl plugins)
+terraform v0.12.24
+provider.rancher2 v1.8.3 (for managing Rancher through Terraform)
 ```
 
 ## Repository structure
 ```
 root
-|- kind
-|- |- config.yaml
 |- apps
-|  |- README.md
-|  |- Chart.yaml
-|  |- templates?
-|  |  |- ...
-|  |- values.yaml?
+|  |- ...
+|     |- templates?
+|     |  |- ...
+|     |- Chart.yaml
+|     |- README.md
+|     |- values.yaml?
 |- auth
 |  |- config
+|  |  |- ...
 |  |- scripts
+|  |  |- ...
+|  |- terraform
+|  |- |- init
+|  |  |  |- ...
+|  |  |- manage
+|  |  |  |- ...
+|  |  |- README.md
 |  |- README.md
 |- conftest-checks
-|  |- deprek8.rego
 |  |- README.md
+|  |- ...
+|- kind
+|  |- config.yaml
 |- Makefile
 |- README.md
 ```

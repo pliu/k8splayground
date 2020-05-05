@@ -1,0 +1,87 @@
+terraform {
+  backend "pg" {
+    conn_str = "postgres://postgres:password@localhost/terraform_backend?sslmode=disable"
+  }
+}
+
+# Provider to connect to Rancher using admin token from init
+provider "rancher2" {
+  api_url   = "https://localhost:444/v3"
+  token_key = "REPLACE_TOKEN"
+  insecure  = true
+}
+
+# Load default Rancher Pod Security Policy named "unrestricted"
+data "rancher2_pod_security_policy_template" "rancher-unrestricted" {
+  name = "unrestricted"
+}
+
+# Create or import cluster
+resource "rancher2_cluster" "test" {
+  name                                    = "test"
+  description                             = "This test cluster that was either created manually and imported or by Terraform"
+  default_pod_security_policy_template_id = data.rancher2_pod_security_policy_template.rancher-unrestricted.id
+}
+
+# Import System project
+resource "rancher2_project" "system" {
+  cluster_id = rancher2_cluster.test.id
+  name       = "System"
+}
+
+# Import Default project
+resource "rancher2_project" "default" {
+  cluster_id = rancher2_cluster.test.id
+  name       = "Default"
+}
+
+# Create "test" project
+resource "rancher2_project" "test" {
+  cluster_id = rancher2_cluster.test.id
+  name       = "Test"
+}
+
+# Create "test" namespace within "test" project
+resource "rancher2_namespace" "test" {
+  name       = "test"
+  project_id = rancher2_project.test.id
+}
+
+# Create "test" user
+resource "rancher2_user" "test" {
+  username = "test"
+  password = "password"
+}
+
+# Grant "test" user "user-base" global role
+resource "rancher2_global_role_binding" "test-global" {
+  name           = "test-global"
+  global_role_id = "user-base"
+  user_id        = rancher2_user.test.id
+}
+
+# Load default Kubernetes Cluster Role named "admin"
+data "rancher2_role_template" "admin" {
+  name = "Kubernetes admin"
+}
+
+# Load default Kubernetes Cluster Role named "view"
+data "rancher2_role_template" "view" {
+  name = "Kubernetes view"
+}
+
+# Grant "test" user "view" role in "default" project
+resource "rancher2_project_role_template_binding" "test-default-view" {
+  name             = "test-default-view"
+  project_id       = rancher2_project.default.id
+  role_template_id = data.rancher2_role_template.view.id
+  user_id          = rancher2_user.test.id
+}
+
+# Grant "test" user "admin" role in "test" project
+resource "rancher2_project_role_template_binding" "test-test-admin" {
+  name             = "test-test-admin"
+  project_id       = rancher2_project.test.id
+  role_template_id = data.rancher2_role_template.admin.id
+  user_id          = rancher2_user.test.id
+}

@@ -1,7 +1,10 @@
 CLUSTER_NAME=k8splayground
 IMAGE=kindest/node:v1.16.4@sha256:b91a2c2317a000f3a783489dfb755064177dbc3a0b2f4147d50f04825d016f55
-RANCHER_CONTAINER_NAME=k8splayground-rancher
+RANCHER_CONTAINER_NAME=$(CLUSTER_NAME)-rancher
+RANCHER_HOST=$$(docker inspect $(RANCHER_CONTAINER_NAME) -f '{{ json .NetworkSettings.Networks.bridge.IPAddress }}')
 RANCHER_PORT=444
+POSTGRES_CONTAINER_NAME=$(CLUSTER_NAME)-postgres
+POSTGRES_PORT=5432
 
 .PHONY: kind_create
 kind_create: users_clear
@@ -81,12 +84,34 @@ conftest_all:
 
 .PHONY: rancher_start
 rancher_start:
-	docker run -d --restart=unless-stopped --name $(RANCHER_CONTAINER_NAME) -p 127.0.0.1:$(RANCHER_PORT):443 rancher/rancher:latest
-	@echo "Docker network IP: $$(docker inspect $(RANCHER_CONTAINER_NAME) -f '{{ json .NetworkSettings.Networks.bridge.IPAddress }}')"
+	docker run -d --name $(RANCHER_CONTAINER_NAME) -p 127.0.0.1:$(RANCHER_PORT):443 rancher/rancher:latest
+	@echo "Docker network IP: $(RANCHER_HOST)"
 
 .PHONY: rancher_stop
 rancher_stop:
 	docker rm -f $(RANCHER_CONTAINER_NAME)
+
+INIT_PATH=cd auth/terraform/init
+MANAGE_PATH=cd auth/terraform/manage
+.PHONY: rancher_tf_init
+rancher_tf_init: rancher_start
+	docker run -d --name $(POSTGRES_CONTAINER_NAME) -e POSTGRES_PASSWORD=password -e POSTGRES_DB=terraform_backend -p \
+	127.0.0.1:$(POSTGRES_PORT):5432 postgres
+	sleep 30
+	$(INIT_PATH) && terraform workspace new init
+	$(INIT_PATH) && terraform init && terraform apply -var="rancher_docker_ip=$(RANCHER_HOST)" -auto-approve -no-color | \
+	grep admin_token | cut -d' ' -f3 > ../manage/token
+	$(MANAGE_PATH) && sed "s|REPLACE_TOKEN|$$(cat token)|g" main.template > main.tf
+
+.PHONY: rancher_tf_apply
+rancher_tf_apply:
+	$(MANAGE_PATH) && (terraform workspace new manage || terraform workspace select manage)
+	$(MANAGE_PATH) && terraform apply
+
+.PHONY: rancher_tf_destroy
+rancher_tf_destroy:
+	-make rancher_stop
+	docker rm -f $(POSTGRES_CONTAINER_NAME)
 
 .PHONY: user_create
 user_create:
