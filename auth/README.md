@@ -18,7 +18,9 @@ Rancher is a Kubernetes cluster manager. It can be used to launch new Kubernetes
 
 We run Rancher in a Docker container alongside the kind "hosts". When creating the Rancher container, we port-forward localhost:444 on the local machine to port 443 on the Rancher container (specified in the Makefile), allowing us to access the Rancher UI.
 
-Unfortunately, many of the steps to set up Rancher must be done through its UI, which is why there are no Makefile targets to execute them. To import the kind cluster into Rancher:
+In this README, the instructions for working with Rancher use its UI. Unfortunately, this is manual which is why there are no Makefile targets. For more information of managing Rancher using Terraform, documentation can be found [here](terraform/README.md)
+
+To import the kind cluster into Rancher:
 
 1. Start the Rancher server. Note down its Docker network IP. If you forgot to do this, you can find it later by running
 ```
@@ -127,13 +129,16 @@ kubectl who-can <kubectl command>
 ```
 
 ## Rancher internals
-Under the hood, Rancher stores its settings as objects in its own dedicated Kubernetes (the Rancher Docker container runs the stripped-down k3s Kubernetes distribution). You can browse these resources by exec-ing into the Rancher container and using kubectl. The mapping of Rancher settings to resources is not intuitive and will require some exploration. As a starting point:
+Under the hood, Rancher stores its settings as objects in its own dedicated Kubernetes (the Rancher Docker container runs the stripped-down k3s Kubernetes distribution). You can browse these resources by exec-ing into the Rancher container (`docker exec -it <container name [`docker ps` to find it]> /bin/bash`) and using kubectl. The mapping of Rancher settings to resources is not intuitive and will require some exploration. As a starting point:
 
 - there are Cluster, Project, User, GlobalRole, ClusterRole, Role, GlobalRoleBinding, ClusterRoleBinding, and RoleBinding resources
 - there are namespaces for each cluster and project
 - some associations make sense (e.g. namespaces associated with clusters contain Project resources) while others are a bit harder to understand (e.g. when are RoleBindings, ClusterRoleBindings, or GlobalRoleBindings used)
 
+Additionally, as Rancher manages Kubernetes clusters through the creation and deletion of various Kubernetes resources (e.g., ClusterRoles, ClusterRoleBindings, RoleBindings), it is important to understand how, if at all, it stays synchronized with the underlying clusters' states, which could shift beneath it.
+
 Examples of Rancher-related things to experiment with:
 
 - explore Rancher's internal state representation
+- determine Rancher's reconciliation behavior (i.e. when and how does it query the cluster's state and reconcile against the Rancher-defined desired state)
 - play around with Rancher's other capabilities (e.g., application deployment and management, monitoring and alerting)

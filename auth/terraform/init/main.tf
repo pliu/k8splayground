@@ -5,6 +5,7 @@ terraform {
 }
 
 # Provider to connect to new Rancher instance
+# The api_url uses Rancher's Docker IP as this is the address that the Kubernetes cluster will attempt to connect to
 provider "rancher2" {
   alias     = "bootstrap"
   api_url   = format("https://%s:443/v3", trim(var.rancher_docker_ip, "\""))
@@ -21,7 +22,6 @@ resource "rancher2_bootstrap" "admin" {
 variable "rancher_docker_ip" {
   type        = string
   description = "Rancher container's Docker IP"
-  default     = ""
 }
 
 output "admin_token" {

@@ -1,0 +1,12 @@
+terraform {
+  backend "pg" {
+    conn_str = "postgres://postgres:password@localhost/terraform_backend?sslmode=disable"
+  }
+}
+
+# Provider to connect to Rancher using admin token from init
+provider "rancher2" {
+  api_url   = "https://localhost:444/v3"
+  token_key = "REPLACE_TOKEN"
+  insecure  = true
+}

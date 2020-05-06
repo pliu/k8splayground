@@ -91,27 +91,40 @@ rancher_start:
 rancher_stop:
 	docker rm -f $(RANCHER_CONTAINER_NAME)
 
-INIT_PATH=cd auth/terraform/init
-MANAGE_PATH=cd auth/terraform/manage
+INIT_PATH=auth/terraform/init
+MANAGE_PATH=auth/terraform/manage
+
 .PHONY: rancher_tf_init
-rancher_tf_init: rancher_start
+rancher_tf_init: terraform_clear rancher_start
 	docker run -d --name $(POSTGRES_CONTAINER_NAME) -e POSTGRES_PASSWORD=password -e POSTGRES_DB=terraform_backend -p \
 	127.0.0.1:$(POSTGRES_PORT):5432 postgres
+	@echo 'Waiting for 30s for the Postgres and Rancher containers to initialize'
 	sleep 30
-	$(INIT_PATH) && terraform workspace new init
-	$(INIT_PATH) && terraform init && terraform apply -var="rancher_docker_ip=$(RANCHER_HOST)" -auto-approve -no-color | \
-	grep admin_token | cut -d' ' -f3 > ../manage/token
-	$(MANAGE_PATH) && sed "s|REPLACE_TOKEN|$$(cat token)|g" main.template > main.tf
+	-cd $(INIT_PATH) && terraform init
+	cd $(INIT_PATH) && terraform workspace new default
+	cd $(INIT_PATH) && terraform init
+	cd $(INIT_PATH) && terraform apply -var="rancher_docker_ip=$(RANCHER_HOST)" -auto-approve -no-color | grep admin_token | \
+	cut -d' ' -f3 > ../manage/token
+	sed "s|REPLACE_TOKEN|$$(cat $(MANAGE_PATH)/token)|g" $(MANAGE_PATH)/provider.template > $(MANAGE_PATH)/provider.tf
+	rm $(MANAGE_PATH)/token
 
 .PHONY: rancher_tf_apply
 rancher_tf_apply:
-	$(MANAGE_PATH) && (terraform workspace new manage || terraform workspace select manage)
-	$(MANAGE_PATH) && terraform apply
+	-cd $(MANAGE_PATH) && terraform init
+	cd $(MANAGE_PATH) && (terraform workspace new manage || terraform workspace select manage)
+	cd $(MANAGE_PATH) && terraform init
+	cd $(MANAGE_PATH) && terraform apply
 
 .PHONY: rancher_tf_destroy
-rancher_tf_destroy:
+rancher_tf_destroy: terraform_clear
 	-make rancher_stop
 	docker rm -f $(POSTGRES_CONTAINER_NAME)
+
+.PHONY: terraform_clear
+terraform_clear:
+	-rm -rf $(INIT_PATH)/.terraform
+	-rm -rf $(MANAGE_PATH)/.terraform
+	-rm -rf $(MANAGE_PATH)/provider.tf
 
 .PHONY: user_create
 user_create:
