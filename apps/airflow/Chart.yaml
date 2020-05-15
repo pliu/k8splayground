@@ -1,0 +1,7 @@
+apiVersion: v2
+name: airflow-playground
+version: 0.0.1
+dependencies:
+- name: airflow
+  version: 7.0.1
+  repository: https://kubernetes-charts.storage.googleapis.com/

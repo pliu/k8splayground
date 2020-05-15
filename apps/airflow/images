@@ -1,0 +1,3 @@
+bitnami/postgresql:11.7.0-debian-10-r9
+bitnami/redis:5.0.7-debian-10-r32
+apache/airflow:1.10.10-python3.6

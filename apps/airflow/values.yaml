@@ -1,0 +1,29 @@
+airflow:
+  airflow:
+    extraPipPackages:
+    - airflow-exporter
+
+  serviceMonitor:
+    enabled: true
+    path: /airflow/admin/metrics
+
+  flower:
+    urlPrefix: /airflow/flower
+
+  web:
+    baseUrl: http://localhost/airflow
+    livenessProbe:
+      initialDelaySeconds: 40
+      failureThreshold: 3
+    readinessProbe:
+      initialDelaySeconds: 40
+      failureThreshold: 3
+  
+  ingress:
+    enabled: true
+    web:
+      path: /airflow
+    flower:
+      path: /airflow/flower(/|$)(.*)
+      annotations:
+        nginx.ingress.kubernetes.io/rewrite-target: /$2

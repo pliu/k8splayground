@@ -29,7 +29,6 @@ nodes:
     listenAddress: 127.0.0.1
     protocol: TCP
 - role: worker
-- role: worker
   kubeadmConfigPatches:
   - |
     kind: JoinConfiguration

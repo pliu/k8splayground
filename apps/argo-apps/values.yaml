@@ -53,3 +53,9 @@ projects:
           targetRevision: HEAD
           path: apps/mock-server
         namespace: default
+      airflow:
+        source:
+          repoURL: https://github.com/pliu/k8splayground.git
+          targetRevision: HEAD
+          path: apps/airflow
+        namespace: default

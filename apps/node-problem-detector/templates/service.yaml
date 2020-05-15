@@ -6,5 +6,5 @@ metadata:
 spec:
   selector: {{ .Values.labels | toYaml | nindent 4 }}
   ports:
-  - name: prom-metrics
+  - name: {{ .Values.metrics_port_name }}
     port: {{ .Values.metrics_port }}

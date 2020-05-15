@@ -1,3 +1,4 @@
+metrics_port_name: prom-metrics
 metrics_port: 5678
 labels:
   app: node-problem-detector

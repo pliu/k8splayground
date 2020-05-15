@@ -5,6 +5,8 @@ nginx-ingress:
   controller:
     metrics:
       enabled: true
+      serviceMonitor:
+        enabled: true
     service:
       type: NodePort
       nodePorts:

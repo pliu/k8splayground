@@ -37,6 +37,7 @@ root
 |     |- templates?
 |     |  |- ...
 |     |- Chart.yaml
+|     |- images?
 |     |- README.md
 |     |- values.yaml?
 |- auth
@@ -50,6 +51,7 @@ root
 |  |  |- manage
 |  |  |  |- ...
 |  |  |- README.md
+|  |- images
 |  |- README.md
 |- conftest-checks
 |  |- README.md
@@ -67,6 +69,7 @@ Current applications include:
 - [Prometheus Operator](apps/prometheus-operator/README.md)
 - [node-problem-detector](apps/node-problem-detector/README.md)
 - [mock server](apps/mock-server/README.md)
+- [Airflow](apps/airflow/README.md)
 
 Each application folder contains, at the very least its own README, with more information on what the application does and how to use it, and Chart.yaml. The Chart.yaml contains some basic metadata about the chart (the package of Kubernetes manifests that defines the Kubernetes objects required to deploy the application) such as name, version, and any dependencies. In addition, it may contain a templates folder that contains the templates from which the actual manifests are rendered. The values used in the rendering are found in the values.yaml file. If none of the templates require rendering, then no values.yaml is needed (e.g. mock-server). If including another chart as a dependency, one can configure the imported chart using the values.yaml file (e.g. prometheus-operator, nginx-ingress).
 
@@ -82,6 +85,13 @@ There are two ways to deploy applications in K8sPlayground: Helm and Argo CD. Th
 The Makefile targets for applying/deleting applications found in the READMEs of the various applications use Helm-driven deployment. These targets are written to create the application if it doesn't exist and to update it otherwise.
 
 The Argo CD Makefile targets are no different and use Helm to apply/delete Argo CD, which subsequently deploys other applications. For more information on how to manage Argo CD-driven application deployment, see Argo CD's README.
+
+## Image caching and preloading
+As K8sPlayground has expanded, the aggregate size of the applications' images has increased substantially (~1.5 GB when last checked). Since destroying the kind cluster wipes the "hosts"' state, everytime the cluster is created and applications deployed to it, all applicable images must be redownloaded. On a good connection (~15 MB/s), it would take a bit under 2 minutes to download the images, with times increasing to over 10 minutes if the speed drops below 2.5 MB/s.
+
+To address this issue, all Makefile targets for applying applications pull the images required for their respective charts (as determined by the images file located in the application's folder) to the local Docker store. This pull only happens once per image so long as the image isn't deleted from the local Docker store as Docker will recognize that it has already cached the image on subsequent pull attempts. Under normal circumstances, though, the kind "hosts" will still directly pull the images they require. However, by setting the PRELOAD environment variable (e.g., `PRELOAD=on make apply_all`, `PRELOAD=on make argo_apply`), the Makefile targets will preload the required images to the kind "hosts" from the local Docker store using `kind load`, essentially eliminating their need to pull images.
+
+On a good connection, it is still recommended to have the kind "hosts" pull their required images directly. This is because `kind load` loads the image onto all of the kind "hosts" regardless of whether it is used on a given "host". As the majority of applications in K8sPlayground, including the three largest images, only run on a single host, this extra copying is both wasteful and itself fairly slow.
 
 ## Commands
 ```

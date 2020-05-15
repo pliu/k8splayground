@@ -6,6 +6,15 @@ RANCHER_PORT=444
 POSTGRES_CONTAINER_NAME=$(CLUSTER_NAME)-postgres
 POSTGRES_PORT=5432
 
+define preload_images
+	cat $(1)/images | while read line ; do \
+	  docker pull $$line; \
+	  if ! test -z "$(PRELOAD)" ; then \
+	    kind load docker-image $$line --name $(CLUSTER_NAME); \
+	  fi; \
+	done
+endef
+
 .PHONY: kind_create
 kind_create: users_clear
 	kind create cluster --config=kind/config.yaml --name $(CLUSTER_NAME) --image $(IMAGE)
@@ -15,11 +24,12 @@ kind_destroy: users_clear
 	kind delete cluster --name $(CLUSTER_NAME)
 
 .PHONY: apply_all
-apply_all: npd_apply mock_apply nginx_apply prometheus_apply
+apply_all: prometheus_apply nginx_apply airflow_apply npd_apply mock_apply
 	@echo 'Everything applied'
 
 .PHONY: npd_apply
 npd_apply:
+	$(call preload_images,apps/node-problem-detector)
 	helm install node-problem-detector apps/node-problem-detector -n kube-system || helm upgrade node-problem-detector \
 	apps/node-problem-detector -n kube-system
 
@@ -29,6 +39,7 @@ npd_delete:
 
 .PHONY: prometheus_apply
 prometheus_apply:
+	$(call preload_images,apps/prometheus-operator)
 	helm dependency update apps/prometheus-operator
 	helm install prometheus-operator apps/prometheus-operator || helm upgrade prometheus-operator apps/prometheus-operator
 
@@ -57,6 +68,7 @@ mock_delete:
 
 .PHONY: nginx_apply
 nginx_apply:
+	$(call preload_images,apps/nginx-ingress)
 	helm dependency update apps/nginx-ingress
 	helm install nginx-ingress apps/nginx-ingress -n kube-system || helm upgrade nginx-ingress apps/nginx-ingress -n kube-system
 
@@ -84,7 +96,8 @@ conftest_all:
 
 .PHONY: rancher_start
 rancher_start:
-	docker run -d --name $(RANCHER_CONTAINER_NAME) -p 127.0.0.1:$(RANCHER_PORT):443 rancher/rancher:latest
+	$(call preload_images,auth)
+	docker run -d --name $(RANCHER_CONTAINER_NAME) -p 127.0.0.1:$(RANCHER_PORT):443 rancher/rancher:v2.4.3
 	@echo "Docker network IP: $(RANCHER_HOST)"
 
 .PHONY: rancher_stop
@@ -97,7 +110,7 @@ MANAGE_PATH=auth/terraform/manage
 .PHONY: rancher_tf_init
 rancher_tf_init: terraform_clear rancher_start
 	docker run -d --name $(POSTGRES_CONTAINER_NAME) -e POSTGRES_PASSWORD=password -e POSTGRES_DB=terraform_backend -p \
-	127.0.0.1:$(POSTGRES_PORT):5432 postgres
+	127.0.0.1:$(POSTGRES_PORT):5432 postgres:12.2
 	@echo 'Waiting for 30s for the Postgres and Rancher containers to initialize'
 	sleep 30
 	-cd $(INIT_PATH) && terraform init
@@ -155,13 +168,27 @@ permissions_delete:
 .PHONY: argo_apply
 argo_apply:
 	-kubectl create namespace argo-cd
+	$(call preload_images,apps/argo-cd)
 	helm install -n argo-cd argo-cd apps/argo-cd || helm upgrade -n argo-cd argo-cd apps/argo-cd
 
 .PHONY: apps_apply
 apps_apply: mock_build
+	-for app_path in $(sort $(dir $(wildcard apps/*/))) ; do \
+	  $(call preload_images,$$app_path); \
+	done
 	helm install -n argo-cd argo-apps apps/argo-apps || helm upgrade -n argo-cd argo-apps apps/argo-apps
 
 .PHONY: argo_delete
 argo_delete:
 	helm uninstall -n argo-cd argo-cd
 	kubectl delete namespace argo-cd
+
+.PHONY: airflow_apply
+airflow_apply:
+	$(call preload_images,apps/airflow)
+	helm dependency update apps/airflow
+	helm install airflow apps/airflow || helm upgrade airflow apps/airflow
+
+.PHONY: airflow_delete
+airflow_delete:
+	helm uninstall airflow

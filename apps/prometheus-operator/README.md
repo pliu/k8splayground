@@ -9,7 +9,7 @@ Grafana is the visualization component of the Prometheus monitoring and alerting
 
 Prometheus Operator automates deployment of the stack by automatically providing the glue that binds the components.
 
-Prometheus' configuration is templated out and configurable through values.yaml. Exporters are configured through ServiceMonitor objects that tie an exporter to the service it is meant to scrape. Similarly, PrometheusRule objects store rules that aggregated into a ConfigMap object that is mounted by the Prometheus instance(s). In this project, ServiceMonitor creation is templated out and can be configured in values.yaml while PrometheusRule creation is automated based on the rules found in rules/. The base Prometheus Operator chart's default rules have been disabled, but its default exporters are enabled and can be configured in values.yaml.
+Prometheus' configuration is templated out and configurable through values.yaml. Exporters are configured through ServiceMonitor objects that tie an exporter to the service it is meant to scrape. Similarly, PrometheusRule objects store rules that aggregated into a ConfigMap object that is mounted by the Prometheus instance(s). In this project, PrometheusRule creation is automated based on the rules found in rules/. The base Prometheus Operator chart's default rules have been disabled, but its default exporters are enabled and can be configured in values.yaml.
 
 Alertmanager's configuration (alertmanager/alertmanager.yaml) is rendered into a Secret object which is mounted by the Alertmanager instance(s).
 
@@ -17,7 +17,7 @@ Grafana's configuration can be found in values.yaml. This is rendered by the bas
 
 The cluster configuration (kind/config.yaml) changes the metrics bind address for kube-proxy and etcd from the default 127.0.0.1 to 0.0.0.0 so that their respective exporters can scrape their metrics.
 
-The convention for this project is for applications that wish to expose metrics via endpoints to define their Service manifests in their own application but to define their ServiceMonitor manifests in the values file of the prometheus-operator application (e.g., nginx-ingress, node-problem-detector). This is because ServiceMonitor is a Custom Resource created by the prometheus-operator application and thus would otherwise impose ordering on application deployment. The metrics Services have no effect in the absence of their respective ServiceMonitor objects.
+The convention for this project is for applications that wish to expose metrics via endpoints to define both their own Service and ServiceMonitor manifests (e.g., nginx-ingress, node-problem-detector). This is because a ServiceMonitor's specification depends on some application-specific context (e.g., Service labels, namespace) which the ServiceMonitors gains access to by being defined in their respective applications. The one exception to this convention is Argo CD: the ServiceMonitors for Argo CD are defined in the Prometheus Operator chart. This is to resolve the potential circular dependency arising from Argo CD being rsponsible for the deployment of the Prometheus Operator chart that defines ServiceMonitors.
 
 Examples of things to experiment with:
 
@@ -43,10 +43,10 @@ To test routing rules, which can be confusing, https://prometheus.io/webtools/al
 
 ## Commands
 ```
-Apply/update prometheus operator:
+Apply/update Prometheus Operator:
 make prometheus_apply
 
-Delete prometheus operator:
+Delete Prometheus Operator:
 make prometheus_delete
 
 Test rules:
