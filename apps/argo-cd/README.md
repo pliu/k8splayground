@@ -34,7 +34,7 @@ Similar to Rancher, only users managed by external user-management systems (e.g.
 In K8sPlayground, user and role management are in the argo-cd chart in the argocd-cm and argocd-rbac-cm ConfigMaps and the argocd-secret Secret. One can also define and bind Project-scoped roles in AppProject manifests.
 
 ## Application deployment
-Helm is used to bootstrap the argo-cd and argo-apps charts. The Makefile targets deploy argo-cd and argo-apps to the `argo-cd` namespace. You can apply argo-apps after argo-cd; however, it may take a couple of minutes for the Argo CD pods to come up, thus delaying the start-up of the applications specified in argo-apps (sometimes, applications may get stuck deploying, in which case delete the associated Application and re-apply it).
+Helm is used to bootstrap the argo-cd and argo-apps charts. The Makefile targets deploy argo-cd and argo-apps to the `argo-cd` namespace. You can apply argo-apps after argo-cd; however, it may take a couple of minutes for the Argo CD Pods to come up, thus delaying the start-up of the applications specified in argo-apps (sometimes, applications may get stuck deploying, in which case delete the associated Application and re-apply it).
 
 In an effort to make Argo CD deployment mirror Helm-based application, the Applications in argo-apps are configured to deploy applications with the same release names and to the same namespaces as the Helm-based approach.
 

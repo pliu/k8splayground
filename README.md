@@ -9,7 +9,7 @@ Examples of things to experiment with:
 
 - kubectl commands
 - how Kubernetes networking works (e.g. look at ip routes on the Docker "hosts")
-- the effect of deleting hosts (Docker "hosts", in this case)
+- the effect of deleting hosts (Docker "hosts", in this case) or the kubelets on them
 - how Helm works
 - how kubeadm works
 - explore various kubectl plugins
@@ -58,6 +58,12 @@ root
 |  |- ...
 |- kind
 |  |- config.yaml
+|- pod-behaviour
+|  |- containers
+|  |  |- ...
+|  |- manifests
+|  |  |- ...
+|  |- README.md
 |- Makefile
 |- README.md
 ```
@@ -71,11 +77,13 @@ Current applications include:
 - [mock server](apps/mock-server/README.md)
 - [Airflow](apps/airflow/README.md)
 
-Each application folder contains, at the very least its own README, with more information on what the application does and how to use it, and Chart.yaml. The Chart.yaml contains some basic metadata about the chart (the package of Kubernetes manifests that defines the Kubernetes objects required to deploy the application) such as name, version, and any dependencies. In addition, it may contain a templates folder that contains the templates from which the actual manifests are rendered. The values used in the rendering are found in the values.yaml file. If none of the templates require rendering, then no values.yaml is needed (e.g. mock-server). If including another chart as a dependency, one can configure the imported chart using the values.yaml file (e.g. prometheus-operator, nginx-ingress).
+Each application folder contains, at the very least, its own README - with more information on what the application does and how to use it - and Chart.yaml. The Chart.yaml contains some basic metadata about the chart (the package of Kubernetes manifests that defines the Kubernetes objects required to deploy the application) such as name, version, and any dependencies. In addition, it may contain a templates folder that contains the templates from which the actual manifests are rendered. The values used in the rendering are found in the values.yaml file. If none of the templates require rendering, then no values.yaml is needed (e.g. mock-server). If including another chart as a dependency, one can configure the imported chart using the values.yaml file (e.g. prometheus-operator, nginx-ingress).
 
 auth contains documentation and tools to learn about authentication and authorization in Kubernetes and Rancher, an external cluster manager. The scripts folder contains helper scripts related to user creation and permissioning through Kubernetes and accessing Kubernetes directly as these newly-created users. The config folder contains the kubeconfig files for these users. Documentation related to authentication and authorization can be found [here](auth/README.md). Additionally, Terraform can be used to manage Rancher with examples located in the terraform folder (with documentation [here](auth/terraform/README.md)).
 
 conftest-checks contains a suite of Rego rules against which Helm-generated manifests should be checked for correctness. Documentation can be found [here](conftest-checks/README.md).
+
+pod-behaviour contains a set of Dockerfiles, manifests, and instructions for experimenting with container and Pod behaviour (e.g., termination grace period, shutdown hooks and signals, exit codes and restart policies). Documentation can be found [here](pod-behaviour/README.md).
 
 The Makefile contains targets for creating and destroying the cluster, applying and deleting the various applications, and other helpers (e.g. running Prometheus rule tests).
 

@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: onfailure
+spec:
+  containers:
+  - name: onfailure
+    image: entrypoint-exec:0.0.1
+    args:
+    - "--error"

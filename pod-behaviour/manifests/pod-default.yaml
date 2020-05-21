@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: default
+spec:
+  containers:
+  - name: default
+    image: entrypoint-exec:0.0.1

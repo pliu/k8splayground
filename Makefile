@@ -35,7 +35,7 @@ npd_apply:
 
 .PHONY: npd_delete
 npd_delete:
-	helm uninstall node-problem-detector --n kube-system
+	helm uninstall node-problem-detector -n kube-system
 
 .PHONY: prometheus_apply
 prometheus_apply:
@@ -192,3 +192,9 @@ airflow_apply:
 .PHONY: airflow_delete
 airflow_delete:
 	helm uninstall airflow
+
+.PHONY: behaviour_build
+behaviour_build:
+	for file_path in $(wildcard pod-behaviour/containers/Dockerfile_*) ; do \
+		docker build -t $$(echo $$file_path | cut -d "_" -f2):0.0.1 -f $$file_path pod-behaviour/containers; \
+	done
