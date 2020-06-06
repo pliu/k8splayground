@@ -2,6 +2,8 @@ airflow:
   airflow:
     extraPipPackages:
     - airflow-exporter
+    config:
+      AIRFLOW__WEBSERVER__EXPOSE_CONFIG: "True"
 
   serviceMonitor:
     enabled: true
@@ -27,3 +29,21 @@ airflow:
       path: /airflow/flower(/|$)(.*)
       annotations:
         nginx.ingress.kubernetes.io/rewrite-target: /$2
+
+  dags:
+    git:
+      url: https://github.com/pliu/k8splayground.git
+      ref: master
+
+      gitSync:
+        enabled: true
+        refreshTime: 60
+
+  workers:
+    tolerations:
+    - key: playground_test
+      operator: Exists
+      effect: NoSchedule
+    replicas: 2
+    celery:
+      instances: 4

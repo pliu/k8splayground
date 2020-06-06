@@ -1,5 +1,5 @@
 # Prometheus Operator
-Prometheus Operator deploys a Prometheus-based monitoring stack that includes Grafana and Alertmanager. It also includes default metrics exporters, dashboards, and rules (we've included the metrics exporters and dashboards, but disabled the default rules).
+Prometheus Operator deploys a Prometheus-based monitoring stack that includes Grafana and Alertmanager. It also includes default metrics exporters, dashboards, and rules (we've included the metrics exporters but disabled the default rules and dashboards).
 
 Prometheus is a popular time-series database that is used for collecting, processing, and alerting on metrics. Specifically, applications that wish to send metrics to Prometheus expose a metrics endpoint that is periodically scraped by Prometheus exporters (the exporters are configured as part of Prometheus' configuration). Prometheus then applies a set of rules (defined in a set of YAML files) to the metrics for processing and possible alerting.
 
@@ -17,7 +17,9 @@ Grafana's configuration can be found in values.yaml. This is rendered by the bas
 
 The cluster configuration (kind/config.yaml) changes the metrics bind address for kube-proxy and etcd from the default 127.0.0.1 to 0.0.0.0 so that their respective exporters can scrape their metrics.
 
-The convention for this project is for applications that wish to expose metrics via endpoints to define both their own Service and ServiceMonitor manifests (e.g., nginx-ingress, node-problem-detector). This is because a ServiceMonitor's specification depends on some application-specific context (e.g., Service labels, namespace) which the ServiceMonitors gains access to by being defined in their respective applications. The one exception to this convention is Argo CD: the ServiceMonitors for Argo CD are defined in the Prometheus Operator chart. This is to resolve the potential circular dependency arising from Argo CD being rsponsible for the deployment of the Prometheus Operator chart that defines ServiceMonitors.
+The convention for this project is for applications that wish to expose metrics via endpoints to define both their own Service and ServiceMonitor manifests (e.g., nginx-ingress, node-problem-detector). This is because a ServiceMonitor's specification depends on some application-specific context (e.g., Service labels, namespace) which the ServiceMonitors gains access to by being defined in their respective applications.
+
+As Prometheus Operator defines ServiceMonitors, this creates a dependency for applications wanting to create their own ServiceMonitors upon the Prometheus Operator chart. To resolve this, we moved ServiceMonitor CRD creation to cluster-creation time.
 
 Examples of things to experiment with:
 

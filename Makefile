@@ -1,5 +1,5 @@
 CLUSTER_NAME=k8splayground
-IMAGE=kindest/node:v1.16.4@sha256:b91a2c2317a000f3a783489dfb755064177dbc3a0b2f4147d50f04825d016f55
+IMAGE=kindest/node:v1.18.2
 RANCHER_CONTAINER_NAME=$(CLUSTER_NAME)-rancher
 RANCHER_HOST=$$(docker inspect $(RANCHER_CONTAINER_NAME) -f '{{ json .NetworkSettings.Networks.bridge.IPAddress }}')
 RANCHER_PORT=444
@@ -18,6 +18,7 @@ endef
 .PHONY: kind_create
 kind_create: users_clear
 	kind create cluster --config=kind/config.yaml --name $(CLUSTER_NAME) --image $(IMAGE)
+	kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/release-0.36/example/prometheus-operator-crd/monitoring.coreos.com_servicemonitors.yaml 
 
 .PHONY: kind_destroy
 kind_destroy: users_clear
@@ -39,6 +40,11 @@ npd_delete:
 
 .PHONY: prometheus_apply
 prometheus_apply:
+	kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/release-0.36/example/prometheus-operator-crd/monitoring.coreos.com_alertmanagers.yaml
+	kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/release-0.36/example/prometheus-operator-crd/monitoring.coreos.com_podmonitors.yaml
+	kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/release-0.36/example/prometheus-operator-crd/monitoring.coreos.com_prometheuses.yaml
+	kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/release-0.36/example/prometheus-operator-crd/monitoring.coreos.com_prometheusrules.yaml
+	kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/release-0.36/example/prometheus-operator-crd/monitoring.coreos.com_thanosrulers.yaml
 	$(call preload_images,apps/prometheus-operator)
 	helm dependency update apps/prometheus-operator
 	helm install prometheus-operator apps/prometheus-operator || helm upgrade prometheus-operator apps/prometheus-operator

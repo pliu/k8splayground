@@ -19,13 +19,13 @@ projects:
       node-problem-detector:
         source:
           repoURL: https://github.com/pliu/k8splayground.git
-          targetRevision: HEAD
+          targetRevision: master
           path: apps/node-problem-detector
         namespace: kube-system
       prometheus-operator:
         source:
           repoURL: https://github.com/pliu/k8splayground.git
-          targetRevision: HEAD
+          targetRevision: master
           path: apps/prometheus-operator
         namespace: default
         ignoreDifferences:
@@ -36,7 +36,7 @@ projects:
       nginx-ingress:
         source:
           repoURL: https://github.com/pliu/k8splayground.git
-          targetRevision: HEAD
+          targetRevision: master
           path: apps/nginx-ingress
         namespace: kube-system
 
@@ -50,12 +50,12 @@ projects:
       mock-server:
         source:
           repoURL: https://github.com/pliu/k8splayground.git
-          targetRevision: HEAD
+          targetRevision: master
           path: apps/mock-server
         namespace: default
       airflow:
         source:
           repoURL: https://github.com/pliu/k8splayground.git
-          targetRevision: HEAD
+          targetRevision: master
           path: apps/airflow
         namespace: default

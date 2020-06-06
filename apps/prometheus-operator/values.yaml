@@ -1,4 +1,8 @@
 prometheus-operator:
+  global:
+    rbac:
+      pspEnabled: false
+
   defaultRules:
     create: false
 
@@ -15,8 +19,9 @@ prometheus-operator:
         action: replace
 
   grafana:
+    rbac:
+      pspEnabled: false
     adminPassword: password
-
     grafana.ini:
       log:
         mode: console
@@ -27,42 +32,11 @@ prometheus-operator:
         provisioning: /etc/grafana/provisioning
       server:
         root_url: http://localhost/grafana
-
     defaultDashboardsEnabled: false
-
     service:
       port: 9090
 
   prometheus:
-    additionalServiceMonitors:
-    - name: argocd-server
-      namespaceSelector:
-        matchNames:
-        - argo-cd
-      selector:
-        matchLabels:
-          app.kubernetes.io/name: argocd-server-metrics
-      endpoints:
-      - port: metrics
-    - name: argocd-repo-server
-      namespaceSelector:
-        matchNames:
-        - argo-cd
-      selector:
-        matchLabels:
-          app.kubernetes.io/name: argocd-repo-server
-      endpoints:
-      - port: metrics
-    - name: argocd
-      namespaceSelector:
-        matchNames:
-        - argo-cd
-      selector:
-        matchLabels:
-          app.kubernetes.io/name: argocd-metrics
-      endpoints:
-      - port: metrics
-
     prometheusSpec:
       externalUrl: prometheus
       ruleSelectorNilUsesHelmValues: false
@@ -70,7 +44,6 @@ prometheus-operator:
       logLevel: debug
       externalLabels:
         cluster: test
-
     service:
       port: 9090
 
@@ -83,10 +56,19 @@ prometheus-operator:
       port: 9090
 
   prometheusOperator:
+    createCustomResource: false
     admissionWebhooks:
       enabled: false
     tlsProxy:
       enabled: false
+
+  kube-state-metrics:
+    podSecurityPolicy:
+      enabled: false
+
+  prometheus-node-exporter:
+    rbac:
+      create: false
 
 alertmanagerConfig:
   url: http://mock-server.default.svc.cluster.local/
