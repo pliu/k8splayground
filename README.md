@@ -1,5 +1,5 @@
 # K8sPlayground
-K8sPlayground is a kind-based (Kubernetes in Docker) environment built to facilitate experimentation with a tight feedback loop, thus accelerating learning and understanding of k8s, related tooling, and k8s applications.
+K8sPlayground is a kind-based (Kubernetes in Docker) environment built to facilitate experimentation with a tight feedback loop, thus accelerating learning and understanding of containers, Kubernetes, and related tooling and applications.
 
 As its name suggests, kind works by spinning up Docker containers to act as "hosts" in a Kubernetes cluster. These Docker "hosts" are subsequently managed by kubeadm to set up Kubernetes components (e.g., kubelet, etcd, api-server, controller-manager, scheduler, kindnet [CNI implementation], coreDNS, kube-proxy).
 
@@ -9,7 +9,7 @@ Examples of things to experiment with:
 
 - kubectl commands
 - how Kubernetes networking works (e.g. look at ip routes on the Docker "hosts")
-- the effect of deleting hosts (Docker "hosts", in this case) or the kubelets on them
+- the effect of deleting hosts (Docker "hosts", in this case) or the kubelets on them on Kubernetes' view of these resources (use `kubectl get nodes` and `kubectl describe nodes <node name>` to list and inspect nodes, respectively)
 - how Helm works
 - how kubeadm works
 - explore various kubectl plugins
@@ -83,7 +83,7 @@ auth contains documentation and tools to learn about authentication and authoriz
 
 conftest-checks contains a suite of Rego rules against which Helm-generated manifests should be checked for correctness. Documentation can be found [here](conftest-checks/README.md).
 
-pod-behaviour contains a set of Dockerfiles, manifests, and instructions for experimenting with container and Pod behaviour (e.g., termination grace period, shutdown hooks and signals, exit codes and restart policies). Documentation can be found [here](pod-behaviour/README.md).
+pod-behaviour contains a set of Dockerfiles, manifests, and instructions for experimenting with container and Pod behaviour (e.g., termination grace period, shutdown hooks and signals, exit codes and restart policies). This is a good module to start with as containers are at the heart of Kubernetes. Documentation can be found [here](pod-behaviour/README.md).
 
 The Makefile contains targets for creating and destroying the cluster, applying and deleting the various applications, and other helpers (e.g. running Prometheus rule tests).
 
@@ -131,5 +131,5 @@ Uninstall kubectl plugin:
 kubectl krew uninstall <plugin name>
 
 Get a shell into a Docker "host":
-docker exec -it <container name [`docker ps` to find it]> /bin/bash
+docker exec -it <container name [`docker ps` to find it]> <shell [e.g., /bin/bash, /bin/sh]>
 ```

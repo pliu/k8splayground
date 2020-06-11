@@ -12,6 +12,10 @@ spec:
       labels:
         app.kubernetes.io/name: {{ .Release.Name }}
     spec:
+      tolerations:
+      - key: playground_test
+        operator: Exists
+        effect: NoSchedule
       nodeSelector:
         mock-server: "true"
       containers:

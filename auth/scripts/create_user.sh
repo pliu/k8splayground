@@ -45,7 +45,7 @@ if [[ $(openssl x509 -in user.crt -pubkey -noout -outform pem | sha256sum) != $(
   exit 1
 fi
 
-# Retrieve k8s certificate
+# Retrieve Kubernetes certificate
 kubectl config view -o jsonpath='{.clusters[0].cluster.certificate-authority-data}' --raw | base64 --decode - > k8s.crt
 
 # Create kubeconfig

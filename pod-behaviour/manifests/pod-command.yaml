@@ -6,7 +6,7 @@ spec:
   restartPolicy: OnFailure
   containers:
   - name: command
-    image: entrypoint-exec:0.0.1
+    image: small-entrypoint-exec:0.0.1
     command:
     - "echo"
     - "test"

@@ -19,7 +19,7 @@ Finally, two important, yet confusing, areas to pay attention to when creating o
 
 Examples of things to experiment with:
 
-- using readiness and liveness probe on Pods to validate a healthy startup and continued health, respectively
+- using readiness and liveness probe on Pods to validate a healthy startup and continued health, respectively, and their effect on service routing
 - using persistent volumes to persist data between Pod lifetimes
 - navigating the Airflow UI (e.g., viewing and interacting with DAGs and their tasks, finding logs for debugging)
 - determining when expressions are evaluated (e.g. DAG load time, DAG run time, task execution time)

@@ -5,4 +5,4 @@ metadata:
 spec:
   containers:
   - name: default
-    image: entrypoint-exec:0.0.1
+    image: small-entrypoint-exec:0.0.1
