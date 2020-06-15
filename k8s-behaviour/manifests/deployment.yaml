@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: deployment
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: deployment
+    spec:
+      tolerations:
+      - key: playground_test
+        operator: Exists
+        effect: NoSchedule
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            preference:
+              matchExpressions:
+              - key: mock-server
+                operator: Exists
+      containers:
+      - name: deployment
+        image: busybox:1.31
+        command: ["/bin/sh", "-c", "while :; do echo '.'; sleep 30 ; done"]
+      terminationGracePeriodSeconds: 5

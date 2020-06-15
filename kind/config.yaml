@@ -12,6 +12,11 @@ kubeadmConfigPatches:
         listen-metrics-urls: "http://0.0.0.0:2381"
 nodes:
 - role: control-plane
+  extraPortMappings:
+  - containerPort: 2379
+    hostPort: 2379
+    listenAddress: 127.0.0.1
+    protocol: TCP
 - role: worker
   kubeadmConfigPatches:
   - |

@@ -16,12 +16,13 @@ define preload_images
 endef
 
 .PHONY: kind_create
-kind_create: users_clear
+kind_create: users_clear etcd_clear
 	kind create cluster --config=kind/config.yaml --name $(CLUSTER_NAME) --image $(IMAGE)
 	kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/release-0.36/example/prometheus-operator-crd/monitoring.coreos.com_servicemonitors.yaml 
+	make etcd_cert
 
 .PHONY: kind_destroy
-kind_destroy: users_clear
+kind_destroy: users_clear etcd_clear
 	kind delete cluster --name $(CLUSTER_NAME)
 
 .PHONY: apply_all
@@ -108,7 +109,7 @@ rancher_start:
 
 .PHONY: rancher_stop
 rancher_stop:
-	docker rm -f $(RANCHER_CONTAINER_NAME)
+	-docker rm -f $(RANCHER_CONTAINER_NAME)
 
 INIT_PATH=auth/terraform/init
 MANAGE_PATH=auth/terraform/manage
@@ -135,15 +136,14 @@ rancher_tf_apply:
 	cd $(MANAGE_PATH) && terraform apply
 
 .PHONY: rancher_tf_destroy
-rancher_tf_destroy: terraform_clear
-	-make rancher_stop
+rancher_tf_destroy: terraform_clear rancher_stop
 	docker rm -f $(POSTGRES_CONTAINER_NAME)
 
 .PHONY: terraform_clear
 terraform_clear:
 	-rm -rf $(INIT_PATH)/.terraform
 	-rm -rf $(MANAGE_PATH)/.terraform
-	-rm -rf $(MANAGE_PATH)/provider.tf
+	-rm $(MANAGE_PATH)/provider.tf
 
 .PHONY: user_create
 user_create:
@@ -151,7 +151,7 @@ user_create:
 
 .PHONY: users_clear
 users_clear:
-	-rm auth/config/*
+	-rm -rf auth/config
 
 .PHONY: permissions_apply
 permissions_apply:
@@ -204,3 +204,11 @@ behaviour_build:
 	for file_path in $(wildcard pod-behaviour/containers/Dockerfile_*) ; do \
 		docker build -t $$(echo $$file_path | cut -d "_" -f2):0.0.1 -f $$file_path pod-behaviour/containers; \
 	done
+
+etcd_cert:
+	-mkdir k8s-behaviour/etcd
+	docker cp k8splayground-control-plane:/etc/kubernetes/pki/etcd/ca.crt k8s-behaviour/etcd/
+	docker cp k8splayground-control-plane:/etc/kubernetes/pki/etcd/ca.key k8s-behaviour/etcd/
+
+etcd_clear:
+	-rm -rf k8s-behaviour/etcd

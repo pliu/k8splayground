@@ -3,3 +3,4 @@ charts/
 auth/config/
 .terraform/
 auth/terraform/manage/provider.tf
+k8s-behaviour/etcd/

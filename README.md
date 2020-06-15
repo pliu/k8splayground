@@ -3,13 +3,12 @@ K8sPlayground is a kind-based (Kubernetes in Docker) environment built to facili
 
 As its name suggests, kind works by spinning up Docker containers to act as "hosts" in a Kubernetes cluster. These Docker "hosts" are subsequently managed by kubeadm to set up Kubernetes components (e.g., kubelet, etcd, api-server, controller-manager, scheduler, kindnet [CNI implementation], coreDNS, kube-proxy).
 
-When the cluster is started, localhost ports 80 and 443 will be mapped to one of the Docker worker "hosts" (specified in kind/config.yaml).
+When the cluster is started, localhost ports 80 and 443 will be mapped to one of the Docker worker "hosts" and localhost port 2379 will be mapped to the Docker control plane "host" (specified in kind/config.yaml).
 
 Examples of things to experiment with:
 
 - kubectl commands
 - how Kubernetes networking works (e.g. look at ip routes on the Docker "hosts")
-- the effect of deleting hosts (Docker "hosts", in this case) or the kubelets on them on Kubernetes' view of these resources (use `kubectl get nodes` and `kubectl describe nodes <node name>` to list and inspect nodes, respectively)
 - how Helm works
 - how kubeadm works
 - explore various kubectl plugins
@@ -27,6 +26,7 @@ conftest 0.17.1 (for checking Helm-generated manifests against Rego rules)
 kubectl-krew v0.3.4 (for installing kubectl plugins)
 terraform v0.12.24
 provider.rancher2 v1.8.3 (for managing Rancher through Terraform)
+etcdctl 3.4.9
 ```
 
 ## Repository structure
@@ -56,6 +56,10 @@ root
 |- conftest-checks
 |  |- README.md
 |  |- ...
+|- k8s-behaviour
+|  |- manifests
+|  |  |- ...
+|  |- README.md
 |- kind
 |  |- config.yaml
 |- pod-behaviour
@@ -82,6 +86,8 @@ Each application folder contains, at the very least, its own README - with more 
 auth contains documentation and tools to learn about authentication and authorization in Kubernetes and Rancher, an external cluster manager. The scripts folder contains helper scripts related to user creation and permissioning through Kubernetes and accessing Kubernetes directly as these newly-created users. The config folder contains the kubeconfig files for these users. Documentation related to authentication and authorization can be found [here](auth/README.md). Additionally, Terraform can be used to manage Rancher with examples located in the terraform folder (with documentation [here](auth/terraform/README.md)).
 
 conftest-checks contains a suite of Rego rules against which Helm-generated manifests should be checked for correctness. Documentation can be found [here](conftest-checks/README.md).
+
+k8s-behaviour contains a set of manifests, scripts, and instructions for experimenting with Kubernetes behaviour (e.g., dangling resources, kubelet failure) and internal state. After the pod-behaviour module, this is a good module to continue with. Documentation can be found [here](k8s-behaviour/README.md).
 
 pod-behaviour contains a set of Dockerfiles, manifests, and instructions for experimenting with container and Pod behaviour (e.g., termination grace period, shutdown hooks and signals, exit codes and restart policies). This is a good module to start with as containers are at the heart of Kubernetes. Documentation can be found [here](pod-behaviour/README.md).
 
@@ -129,7 +135,4 @@ kubectl krew list
 
 Uninstall kubectl plugin:
 kubectl krew uninstall <plugin name>
-
-Get a shell into a Docker "host":
-docker exec -it <container name [`docker ps` to find it]> <shell [e.g., /bin/bash, /bin/sh]>
 ```

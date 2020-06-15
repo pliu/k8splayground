@@ -1,5 +1,5 @@
 # Pod Behaviour
-Understanding the behaviour of Pods and the containers that comprise them and the interaction between their behaviours is important for ensuring workloads behave the way they're expected to, especially at critical points such as container failure or controlled termination. Below, we document various container and Pod behaviours and provide resources and instructions for observing them for yourself.
+Understanding the behaviour of Pods and the containers that comprise them and the interaction between their behaviours is important for ensuring workloads behave the way they're expected to, especially at critical points such as container failure or controlled termination. Below, we document various container and Pod behaviours and provide resources and instructions for investigating them for yourself.
 
 Unfortunately, we have not documented all combinations of the various configurations and their behaviour. Instead, we encourage you to explore these edge cases further on your own, as is done in the other modules of K8sPlayground.
 
@@ -98,6 +98,9 @@ docker stop -t <grace period in seconds> <container name>
 
 Remove container (must already be stopped):
 docker rm <container name>
+
+Get a shell into a Docker "host":
+docker exec -it <container name [`docker ps` to find it]> <shell [e.g., /bin/bash, /bin/sh]>
 
 Create Kubernetes resource from a manifest in the default namespace:
 kubectl apply -f <path to manifest>

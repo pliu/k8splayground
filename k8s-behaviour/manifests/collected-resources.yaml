@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: collected-resources
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: collected-resources
+  namespace: collected-resources
+spec:
+  containers:
+  - name: collected-resources
+    image: busybox:1.31
+    command: ["/bin/sh", "-c", "while :; do echo '.'; sleep 30 ; done"]
+  terminationGracePeriodSeconds: 5
