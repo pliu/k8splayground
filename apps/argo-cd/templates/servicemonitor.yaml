@@ -11,7 +11,7 @@ spec:
   - port: metrics
   namespaceSelector:
     matchNames:
-    - argo-cd
+    - {{ .Release.Namespace }}
   selector:
     matchLabels:
       app.kubernetes.io/name: argocd-metrics
@@ -29,7 +29,7 @@ spec:
   - port: metrics
   namespaceSelector:
     matchNames:
-    - argo-cd
+    - {{ .Release.Namespace }}
   selector:
     matchLabels:
       app.kubernetes.io/name: argocd-repo-server
@@ -47,7 +47,7 @@ spec:
   - port: metrics
   namespaceSelector:
     matchNames:
-    - argo-cd
+    - {{ .Release.Namespace }}
   selector:
     matchLabels:
       app.kubernetes.io/name: argocd-server-metrics

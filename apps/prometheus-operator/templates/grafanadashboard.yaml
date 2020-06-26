@@ -6,7 +6,7 @@ metadata:
   labels:
     grafana_dashboard: "1"
   name: {{ $filename }}-dashboard
-data: 
+data:
   {{ $filename }}.json: |- {{ $.Files.Get $path | nindent 4 }}
 ---
 {{ end -}}

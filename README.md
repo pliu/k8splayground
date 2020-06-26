@@ -12,6 +12,7 @@ Examples of things to experiment with:
 - how Helm works
 - how kubeadm works
 - explore various kubectl plugins
+- using a GUI (lens) to explore Kubernetes state
 
 You can destroy and recreate the cluster to reset it if during the course of experimentation the cluster gets into a bad state - a major benefit of having such a local test environment.
 
@@ -27,6 +28,7 @@ kubectl-krew v0.3.4 (for installing kubectl plugins)
 terraform v0.12.24
 provider.rancher2 v1.8.3 (for managing Rancher through Terraform)
 etcdctl 3.4.9
+lens 3.5.1
 ```
 
 ## Repository structure
@@ -91,10 +93,8 @@ k8s-behaviour contains a set of manifests, scripts, and instructions for experim
 
 pod-behaviour contains a set of Dockerfiles, manifests, and instructions for experimenting with container and Pod behaviour (e.g., termination grace period, shutdown hooks and signals, exit codes and restart policies). This is a good module to start with as containers are at the heart of Kubernetes. Documentation can be found [here](pod-behaviour/README.md).
 
-The Makefile contains targets for creating and destroying the cluster, applying and deleting the various applications, and other helpers (e.g. running Prometheus rule tests).
-
 ## Application deployment
-There are two ways to deploy applications in K8sPlayground: Helm and Argo CD. The two methods, as set up in this project, are mutually exclusive as they are configured to deploy the same applications with the same names in the same namespaces. 
+There are two ways to deploy applications in K8sPlayground: Helm and Argo CD. The two methods, as set up in this project, are mutually exclusive as they are configured to deploy the same applications with the same names in the same namespaces.
 
 The Makefile targets for applying/deleting applications found in the READMEs of the various applications use Helm-driven deployment. These targets are written to create the application if it doesn't exist and to update it otherwise.
 

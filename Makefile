@@ -18,7 +18,7 @@ endef
 .PHONY: kind_create
 kind_create: users_clear etcd_clear
 	kind create cluster --config=kind/config.yaml --name $(CLUSTER_NAME) --image $(IMAGE)
-	kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/release-0.36/example/prometheus-operator-crd/monitoring.coreos.com_servicemonitors.yaml 
+	kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/release-0.36/example/prometheus-operator-crd/monitoring.coreos.com_servicemonitors.yaml
 	make etcd_cert
 
 .PHONY: kind_destroy
@@ -117,7 +117,7 @@ MANAGE_PATH=auth/terraform/manage
 .PHONY: rancher_tf_init
 rancher_tf_init: terraform_clear rancher_start
 	docker run -d --name $(POSTGRES_CONTAINER_NAME) -e POSTGRES_PASSWORD=password -e POSTGRES_DB=terraform_backend -p \
-	127.0.0.1:$(POSTGRES_PORT):5432 postgres:12.2
+	127.0.0.1:$(POSTGRES_PORT):5432 postgres:11.8-alpine
 	@echo 'Waiting for 30s for the Postgres and Rancher containers to initialize'
 	sleep 30
 	-cd $(INIT_PATH) && terraform init

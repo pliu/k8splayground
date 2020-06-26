@@ -20,7 +20,7 @@ airflow:
     readinessProbe:
       initialDelaySeconds: 40
       failureThreshold: 3
-  
+
   ingress:
     enabled: true
     web:
