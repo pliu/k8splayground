@@ -29,6 +29,7 @@ terraform v0.12.24
 provider.rancher2 v1.8.3 (for managing Rancher through Terraform)
 etcdctl 3.4.9
 lens 3.5.1
+go 1.13.5
 ```
 
 ## Repository structure
@@ -37,6 +38,8 @@ root
 |- apps
 |  |- ...
 |     |- templates?
+|     |  |- ...
+|     |- ...
 |     |  |- ...
 |     |- Chart.yaml
 |     |- images?
@@ -82,6 +85,7 @@ Current applications include:
 - [node-problem-detector](apps/node-problem-detector/README.md)
 - [mock server](apps/mock-server/README.md)
 - [Airflow](apps/airflow/README.md)
+- [distributor](apps/distributor/README.md)
 
 Each application folder contains, at the very least, its own README - with more information on what the application does and how to use it - and Chart.yaml. The Chart.yaml contains some basic metadata about the chart (the package of Kubernetes manifests that defines the Kubernetes objects required to deploy the application) such as name, version, and any dependencies. In addition, it may contain a templates folder that contains the templates from which the actual manifests are rendered. The values used in the rendering are found in the values.yaml file. If none of the templates require rendering, then no values.yaml is needed (e.g. mock-server). If including another chart as a dependency, one can configure the imported chart using the values.yaml file (e.g. prometheus-operator, nginx-ingress).
 

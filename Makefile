@@ -26,7 +26,7 @@ kind_destroy: users_clear etcd_clear
 	kind delete cluster --name $(CLUSTER_NAME)
 
 .PHONY: apply_all
-apply_all: prometheus_apply nginx_apply airflow_apply npd_apply mock_apply
+apply_all: prometheus_apply nginx_apply airflow_apply npd_apply mock_apply distributor_apply
 	@echo 'Everything applied'
 
 .PHONY: npd_apply
@@ -67,6 +67,7 @@ mock_build:
 
 .PHONY: mock_apply
 mock_apply: mock_build
+	kubectl delete deployment mock-server
 	helm install mock-server apps/mock-server || helm upgrade mock-server apps/mock-server
 
 .PHONY: mock_delete
@@ -178,7 +179,7 @@ argo_apply:
 	helm install -n argo-cd argo-cd apps/argo-cd || helm upgrade -n argo-cd argo-cd apps/argo-cd
 
 .PHONY: apps_apply
-apps_apply: mock_build
+apps_apply: mock_build distributor_build
 	-for app_path in $(sort $(dir $(wildcard apps/*/))) ; do \
 	  $(call preload_images,$$app_path); \
 	done
@@ -205,10 +206,40 @@ behaviour_build:
 		docker build -t $$(echo $$file_path | cut -d "_" -f2):0.0.1 -f $$file_path pod-behaviour/containers; \
 	done
 
+.PHONY: etcd_cert
 etcd_cert:
 	-mkdir k8s-behaviour/etcd
 	docker cp k8splayground-control-plane:/etc/kubernetes/pki/etcd/ca.crt k8s-behaviour/etcd/
 	docker cp k8splayground-control-plane:/etc/kubernetes/pki/etcd/ca.key k8s-behaviour/etcd/
 
+.PHONY: etcd_clear
 etcd_clear:
 	-rm -rf k8s-behaviour/etcd
+
+.PHONY: distributor_build
+distributor_build:
+	cd apps/distributor/client/bin && go build client.go
+	docker build -t distributor:0.0.1 apps/distributor/client
+	rm apps/distributor/client/bin/client
+	kind load docker-image distributor:0.0.1 --name $(CLUSTER_NAME)
+
+.PHONY: distributor_apply
+distributor_apply: distributor_build
+	-kubectl create namespace distributor
+	-kubectl delete deployment -n distributor distributor
+	helm install -n distributor distributor apps/distributor || helm upgrade -n distributor distributor apps/distributor
+
+.PHONY: distributor_delete
+distributor_delete:
+	helm uninstall -n distributor distributor
+	kubectl delete namespace distributor
+
+.PHONY: distributor_test
+distributor_test:
+	-cd apps/distributor/client && go test ./tests/...
+
+.PHONY: distributor_run
+distributor_run:
+	-kubectl delete -f apps/distributor/templates/configmap.yaml
+	kubectl apply -f apps/distributor/templates/configmap.yaml
+	cd apps/distributor/client/bin && HOSTNAME=local CONFIGMAP_NAME=distributor RUN_MODE=local go run client.go

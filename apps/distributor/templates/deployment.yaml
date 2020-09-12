@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ .Release.Name }}
+    spec:
+      tolerations:
+      - key: playground_test
+        operator: Exists
+        effect: NoSchedule
+      containers:
+      - image: distributor:0.0.1
+        name: {{ .Release.Name }}
+        env:
+          - name: CONFIGMAP_NAME
+            value: {{ .Release.Name }}
+      serviceAccountName: {{ .Release.Name }}
