@@ -140,5 +140,5 @@ Additionally, as Rancher manages Kubernetes clusters through the creation and de
 Examples of Rancher-related things to experiment with:
 
 - explore Rancher's internal state representation
-- determine Rancher's reconciliation behavior (i.e. when and how does it query the cluster's state and reconcile against the Rancher-defined desired state)
+- determine Rancher's reconciliation behaviour (i.e. when and how does it query the cluster's state and reconcile against the Rancher-defined desired state)
 - play around with Rancher's other capabilities (e.g., application deployment and management, monitoring and alerting)

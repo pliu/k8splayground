@@ -4,3 +4,4 @@ metadata:
   name: distributor
   annotations:
     distributor_capacity: '{"a": 1, "b": 2}'
+    distributor_assignment: '{"a": "a"}'

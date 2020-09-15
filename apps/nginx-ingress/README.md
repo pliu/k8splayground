@@ -15,7 +15,7 @@ Examples of things to experiment with:
 ## Testing
 See the READMEs of mock-server, prometheus-operator, or argo-cd for how to test that nginx-ingress is routing traffic correctly.
 
-Specifically, mock-server logs the source IP of incoming requests and thus is a good resource for exploring the behavior of various service configurations.
+Specifically, mock-server logs the source IP of incoming requests and thus is a good resource for exploring the behaviour of various service configurations.
 
 The ingress-nginx kubectl plugin is helpful to explore the state of the NGINX Ingress controller (e.g. the NGINX routing config that is generated based on associated Ingresses, the list of dynamically-discovered backends to which traffic is routed).
 

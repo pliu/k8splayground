@@ -17,10 +17,8 @@ var VoidValue Void
 
 func ClaimResource(c client.Client, configmapName string, namespaceName string, hostname string) {
 	for true {
-		if !isRunModeLocal() {
-			if deleted, success := tryCleanup(c, configmapName, namespaceName); success {
-				fmt.Printf("Deleted assignments for %v\n", deleted)
-			}
+		if deleted, success := tryCleanup(c, configmapName, namespaceName); success {
+			fmt.Printf("Deleted assignments for %v\n", deleted)
 		}
 		if assignment, success := TryClaimResource(c, configmapName, namespaceName, hostname); success {
 			fmt.Printf("Assigned %s\n", assignment)

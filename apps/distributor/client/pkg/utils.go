@@ -20,6 +20,13 @@ func GetDistributorNamespace() (string, error) {
 	return ns, nil
 }
 
+func GetHostname() string {
+	if isRunModeLocal() {
+		return "local"
+	}
+	return os.Getenv(HOSTNAME_ENV_KEY)
+}
+
 func ParseJson(jsonString string) map[string]interface{} {
 	var result map[string]interface{}
 	json.Unmarshal([]byte(jsonString), &result)

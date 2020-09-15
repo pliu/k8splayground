@@ -22,7 +22,7 @@ func main() {
 		fmt.Printf("%s not set\n", distributor.CONFIGMAP_NAME_ENV_KEY)
 		os.Exit(1)
 	}
-	hostname := os.Getenv(distributor.HOSTNAME_ENV_KEY)
+	hostname := distributor.GetHostname()
 	if hostname == "" {
 		fmt.Printf("%s not set\n", distributor.HOSTNAME_ENV_KEY)
 		os.Exit(1)

@@ -180,6 +180,7 @@ argo_apply:
 
 .PHONY: apps_apply
 apps_apply: mock_build distributor_build
+	-kubectl create namespace distributor
 	-for app_path in $(sort $(dir $(wildcard apps/*/))) ; do \
 	  $(call preload_images,$$app_path); \
 	done
@@ -242,4 +243,4 @@ distributor_test:
 distributor_run:
 	-kubectl delete -f apps/distributor/templates/configmap.yaml
 	kubectl apply -f apps/distributor/templates/configmap.yaml
-	cd apps/distributor/client/bin && HOSTNAME=local CONFIGMAP_NAME=distributor RUN_MODE=local go run client.go
+	cd apps/distributor/client/bin && CONFIGMAP_NAME=distributor RUN_MODE=local go run client.go

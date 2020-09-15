@@ -46,6 +46,7 @@ projects:
     - 'https://github.com/pliu/k8splayground.git'
     whitelistedNamespaces:
     - default
+    - distributor
     applications:
       mock-server:
         source:
@@ -59,3 +60,9 @@ projects:
           targetRevision: master
           path: apps/airflow
         namespace: default
+      distributor:
+        source:
+          repoURL: https://github.com/pliu/k8splayground.git
+          targetRevision: master
+          path: apps/distributor
+        namespace: distributor
