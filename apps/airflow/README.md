@@ -40,8 +40,8 @@ Examples of things to experiment with:
 ## Testing
 If nginx-ingress is running, Airflow configuration changes and DAG changes can be verified from the Airflow UI on one's local machine. The Flower UI can be used to verify worker configuration changes and to track tasks in the Celery queue.
 ```
-http://localhost:80/airflow
-http://localhost:80/airflow/flower
+http://localhost/airflow
+http://localhost/airflow/flower
 ```
 Additionally, the current and historical statuses of DAG runs and tasks can be checked in the Airflow UI. A particularly useful feature of the UI is the graphical representation of DAGs, allowing you to easily visualize task dependencies.
 

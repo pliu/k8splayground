@@ -86,6 +86,7 @@ Current applications include:
 - [mock server](apps/mock-server/README.md)
 - [Airflow](apps/airflow/README.md)
 - [distributor](apps/distributor/README.md)
+- [logging](apps/logging/README.md)
 
 Each application folder contains, at the very least, its own README - with more information on what the application does and how to use it - and Chart.yaml. The Chart.yaml contains some basic metadata about the chart (the package of Kubernetes manifests that defines the Kubernetes objects required to deploy the application) such as name, version, and any dependencies. In addition, it may contain a templates folder that contains the templates from which the actual manifests are rendered. The values used in the rendering are found in the values.yaml file. If none of the templates require rendering, then no values.yaml is needed (e.g. mock-server). If including another chart as a dependency, one can configure the imported chart using the values.yaml file (e.g. prometheus-operator, nginx-ingress).
 

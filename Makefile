@@ -244,3 +244,13 @@ distributor_run:
 	-kubectl delete -f apps/distributor/templates/configmap.yaml
 	kubectl apply -f apps/distributor/templates/configmap.yaml
 	cd apps/distributor/client/bin && CONFIGMAP_NAME=distributor RUN_MODE=local go run client.go
+
+.PHONY: logging_apply
+logging_apply:
+	$(call preload_images,apps/logging)
+	helm dependency update apps/logging
+	helm install logging apps/logging -n kube-system || helm upgrade logging apps/logging -n kube-system
+
+.PHONY: logging_delete
+logging_delete:
+	helm uninstall logging -n kube-system

@@ -35,9 +35,9 @@ Examples of things to experiment with:
 ## Testing
 If nginx-ingress is running, configuration changes can be verified from the Prometheus/Grafana/Alertmanager UIs on one's local machine (the Grafana username/password is admin/password).
 ```
-http://localhost:80/prometheus
-http://localhost:80/grafana
-http://localhost:80/alertmanager
+http://localhost/prometheus
+http://localhost/grafana
+http://localhost/alertmanager
 ```
 Similarly, exporters and rules can be viewed in the Prometheus UI, dashboards in the Grafana UI, and triggered alerts in the Alertmanager UI.
 
@@ -55,5 +55,5 @@ Test rules:
 make prometheus_test_rules
 
 Send test alert to Alertmanager:
-curl -H "Content-Type: application/json" -d '[{"labels":{"alertname":"TestAlert","severity":"critical"}}]' localhost:80/alertmanager/api/v1/alerts
+curl -H "Content-Type: application/json" -d '[{"labels":{"alertname":"TestAlert","severity":"critical"}}]' localhost/alertmanager/api/v1/alerts
 ```
