@@ -20,7 +20,6 @@ Finally, two important, yet confusing, areas to pay attention to when creating o
 Examples of things to experiment with:
 
 - using readiness and liveness probe on Pods to validate a healthy startup and continued health, respectively, and their effect on service routing
-- using persistent volumes to persist data between Pod lifetimes
 - navigating the Airflow UI (e.g., viewing and interacting with DAGs and their tasks, finding logs for debugging)
 - determining when expressions are evaluated (e.g. DAG load time, DAG run time, task execution time)
 - understanding the effect of changing the IDs of running DAGs
@@ -44,6 +43,8 @@ http://localhost/airflow
 http://localhost/airflow/flower
 ```
 Additionally, the current and historical statuses of DAG runs and tasks can be checked in the Airflow UI. A particularly useful feature of the UI is the graphical representation of DAGs, allowing you to easily visualize task dependencies.
+
+If prometheus-operator is running, Airflow metrics will be viewable in Prometheus.
 
 When debugging DAGs, there are a couple of places that may contain useful logs. If the DAG definition has errors or there are errors scheduling or running tasks, looking at the Airflow server, scheduler, or worker logs using `kubectl logs` is a good place to start. If the code that the task runs has errors, then you should first check the task logs in the Airflow UI.
 

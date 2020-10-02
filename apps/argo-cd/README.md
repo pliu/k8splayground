@@ -43,6 +43,8 @@ There is an important difference between deploying applications through Argo CD 
 ## Testing
 Among the applications configured to be deployed by Argo CD in K8sPlayground is nginx-ingress. If nginx-ingress is running, configuration changes can be verified from the Argo CD UI (https://localhost/argo-cd) on one's local machine (`admin`'s username/password is admin/password while `user`'s is user/password). admin has all permissions across all Projects while user has all permissions in the apps Project (except being able to manually create Applications since we want Applications to be defined in argo-apps) and view other Projects.
 
+If prometheus-operator is running, Argo CD metrics will be viewable in Prometheus.
+
 ## Commands
 ```
 Apply/update Argo CD:

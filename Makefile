@@ -26,7 +26,7 @@ kind_destroy: users_clear etcd_clear
 	kind delete cluster --name $(CLUSTER_NAME)
 
 .PHONY: apply_all
-apply_all: prometheus_apply nginx_apply airflow_apply npd_apply mock_apply distributor_apply
+apply_all: prometheus_apply nginx_apply airflow_apply npd_apply mock_apply distributor_apply logging_apply
 	@echo 'Everything applied'
 
 .PHONY: npd_apply

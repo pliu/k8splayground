@@ -31,6 +31,7 @@ Examples of things to experiment with:
 - adding new alerting rules
 - adding new Grafana dashboards
 - adding new Grafana data sources
+- understanding how scrape interval, evaluation interval, lookback window, and "for" interact and affect event detection
 
 ## Testing
 If nginx-ingress is running, configuration changes can be verified from the Prometheus/Grafana/Alertmanager UIs on one's local machine (the Grafana username/password is admin/password).
