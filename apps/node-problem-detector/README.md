@@ -11,12 +11,14 @@ Examples of things to experiment with:
 
 - the effects of node taints and Pod tolerations (and the difference between NoSchedule and NoExecute)
 - the self-healing properties of daemon sets
-- RBAC permissions (e.g. node-problem-detector needs permission to update nodes)
+- RBAC permissions (e.g., node-problem-detector needs permission to update nodes)
 - mounting branches of the host's filesystem into a container
 - adding new tests to node-problem-detector
 
 ## Testing
-If prometheus-operator is running, the metrics will be viewable in Prometheus. Describing a node would show any conditions or events attached to it by the node problem detector.
+Describing a node would show any conditions or events attached to it by the node problem detector.
+
+If prometheus-operator is running, the metrics will be viewable in Prometheus. If not, it is still possible to view any individual instance's metrics by port forwarding to the given instance (`kubectl port-forward <Pod name> -n kube-system <local port>:<node problem detector's configured metrics port; currently set to 5678>`) and then running `curl localhost:<local port>/metrics` to get the metrics in Prometheus format.
 
 To determine if mounting is working as intended, one can exec into the container to inspect the filesystem.
 

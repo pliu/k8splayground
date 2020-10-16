@@ -6,7 +6,7 @@ It uses annotations on a ConfigMap object to store the total resource counts as 
 Distributor currently has the following behaviour (in all below cases, hosts refers to individual Pods):
 
 - each instance of distributor runs every 50-70s
-- each run starts by cleaning existing assignments (i.e. removing assignments to hosts that no longer exist)
+- each run starts by cleaning existing assignments (i.e., removing assignments to hosts that no longer exist)
 - each run then looks for free resources and, if there are any, claims one for its host
 
 The above results in a decentralized system that automatically distributes resources across a set of hosts, even as hosts join and leave the set.
@@ -19,7 +19,7 @@ The two annotation fields distributor makes use of are:
 Examples of things to experiment with:
 
 - using ServiceAccounts, Roles, and RoleBindings to provide permissions to apps running within Kubernetes
-- determining the concurrency model of Kubernetes objects (e.g. can writes stomp on each other)
+- determining the concurrency model of Kubernetes objects (e.g., can writes stomp on each other)
 - modifying the system to support requesting multiple resources (currently, each host will only be assigned at most one resource)
 - modifying the system to support subscribing to multiple ConfigMaps, each with its own set of resources
 

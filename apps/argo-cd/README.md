@@ -7,7 +7,7 @@ Projects contain Applications, all of which share the Project's configurations. 
 
 Under the hood, Argo CD uses Helm (Argo CD supports both Helm 2 and Helm 3, but K8sPlayground uses Helm 3) to deploy applications. It uses the apiVersion of a chart's Chart.yaml to determine which version of Helm to use (v1 signals for Argo CD to use Helm 2 while v2 signals it to use Helm 3).
 
-Applications are essentially wrappers around Helm charts that provide extra information such as where the chart should be retrieved from (e.g. which Git repository, which revision, and at what path), which cluster and namespace should it be deployed in, and whether Argo CD should automatically sync it. It is the rendered chart that is specified by an Application that serves as the desired state that Argo CD attempts to converge to.
+Applications are essentially wrappers around Helm charts that provide extra information such as where the chart should be retrieved from (e.g., which Git repository, which revision, and at what path), which cluster and namespace should it be deployed in, and whether Argo CD should automatically sync it. It is the rendered chart that is specified by an Application that serves as the desired state that Argo CD attempts to converge to.
 
 By default, Argo CD polls the Git repositories specified by the Applications it manages every 3 minutes for changes, refreshing the respective applications if any changes are detected. Argo CD can also be configured to receive webhook requests from these repositories to notify it of changes (K8sPlayground does not have this feature enabled as it requires a stable URL to which to send the webhook requests).
 
@@ -29,7 +29,7 @@ In K8sPlayground, there are two Projects - apps and systems - with all managed a
 ## Authentication and authorization
 Similar to Kubernetes, Argo CD uses RBAC to grant permissions to users and groups (roles with sets of permissions are defined and then mapped to users and groups; Argo CD also allows direct mapping of permissions to users and groups).
 
-Similar to Rancher, only users managed by external user-management systems (e.g. OIDC) are associated with groups.
+Similar to Rancher, only users managed by external user-management systems (e.g., OIDC) are associated with groups.
 
 In K8sPlayground, user and role management are in the argo-cd chart in the argocd-cm and argocd-rbac-cm ConfigMaps and the argocd-secret Secret. One can also define and bind Project-scoped roles in AppProject manifests.
 
@@ -38,12 +38,12 @@ Helm is used to bootstrap the argo-cd and argo-apps charts. The Makefile targets
 
 In an effort to make Argo CD deployment mirror Helm-based application, the Applications in argo-apps are configured to deploy applications with the same release names and to the same namespaces as the Helm-based approach. Additionally, the Makefile target to delete Argo CD leaves its managed applications intact. Although argo-cd contains the AppProject and Application CRDs and, thus, the deletion of argo-cd would result in the deletion of AppProject and Application objects from argo-apps as well, the direct deletion of these objects does not affect the applications they manage. To delete an application that is managed by Argo CD, delete it from the Argo CD UI with Cascade.
 
-There is an important difference between deploying applications through Argo CD compared to using Helm. Although applying argo-cd via Helm behaves the way one might expect (i.e. changes made to its chart are reflected after the next application), deploying applications through argo-apps behaves a little differently. When applying argo-apps through Helm, changes made to Projects or Application configuration will be reflected but changes in the application will not. This is because when Argo CD deploys an application, it deploys the chart from the specified Git repository at the specified revision. Thus, for Argo CD to pick up changes in application charts, they must first be pushed to the Git repository.
+There is an important difference between deploying applications through Argo CD compared to using Helm. Although applying argo-cd via Helm behaves the way one might expect (i.e., changes made to its chart are reflected after the next application), deploying applications through argo-apps behaves a little differently. When applying argo-apps through Helm, changes made to Projects or Application configuration will be reflected but changes in the application will not. This is because when Argo CD deploys an application, it deploys the chart from the specified Git repository at the specified revision. Thus, for Argo CD to pick up changes in application charts, they must first be pushed to the Git repository.
 
 ## Testing
 Among the applications configured to be deployed by Argo CD in K8sPlayground is nginx-ingress. If nginx-ingress is running, configuration changes can be verified from the Argo CD UI (https://localhost/argo-cd) on one's local machine (`admin`'s username/password is admin/password while `user`'s is user/password). admin has all permissions across all Projects while user has all permissions in the apps Project (except being able to manually create Applications since we want Applications to be defined in argo-apps) and view other Projects.
 
-If prometheus-operator is running, Argo CD metrics will be viewable in Prometheus.
+If prometheus-operator is running, Argo CD metrics will be viewable in Prometheus. If not, it is still possible to view any individual instance's metrics by port forwarding to the given instance (`kubectl port-forward <Argo CD component Pod name> -n argo-cd <local port>:<Argo CD component's configured metrics port; the defaults are 8082, 8084, and 8083 for the application controller, repo server, and server, respectively>`) and then running `curl localhost:<local port>/metrics` to get the metrics in Prometheus format.
 
 ## Commands
 ```

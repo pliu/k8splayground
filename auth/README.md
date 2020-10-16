@@ -11,7 +11,7 @@ Examples of things to experiment with:
 ## Kubernetes' authentication and authorization model
 Kubernetes has two primary ways to identify clients: "users" and service accounts ("users" are used by external clients whereas service accounts are used by services internal to Kubernetes). Users are not explicitly represented as a Kubernetes objects but are instead implicitly derived from the Common Name field in the subject of the Kubernetes-signed certificate a client uses to authenticate with the cluster. Group membership is similarly implicit and found in the Organization fields.
 
-Role-based access control (RBAC) is the most popular authorization model used by Kubernetes. In this model, permissions (i.e. which actions are allowed on which resources) are captured as roles (Roles are namespace-specific permissions whereas ClusterRoles are cluster-wide). RoleBindings and ClusterRoleBindings are then used to bind roles to entities (e.g. "users", "groups", and service accounts) with RoleBindings binding roles to entities in specific namespaces whereas ClusterRoleBindings bind the roles to entities across the entire cluster.
+Role-based access control (RBAC) is the most popular authorization model used by Kubernetes. In this model, permissions (i.e., which actions are allowed on which resources) are captured as roles (Roles are namespace-specific permissions whereas ClusterRoles are cluster-wide). RoleBindings and ClusterRoleBindings are then used to bind roles to entities (e.g., "users", "groups", and service accounts) with RoleBindings binding roles to entities in specific namespaces whereas ClusterRoleBindings bind the roles to entities across the entire cluster.
 
 ## Rancher
 Rancher is a Kubernetes cluster manager. It can be used to launch new Kubernetes clusters, manage existing ones (explore Kubernetes in a manner similar to kubectl but graphically), deploy and manage applications via Helm charts, monitor, alert, and aggregate logs across clusters, and provides user and group management and authorization capabilities. We will use Rancher primarily for its user management and authorization capabilities as group management requires external identity providers, we use Helm directly to deploy and manage applications, and we use Prometheus Operator for monitoring and alerting.
@@ -36,10 +36,10 @@ Rancher builds on top of the Kubernetes model and has the following main abstrac
 
 - cluster: the clusters managed by Rancher
 - user/group: Rancher users and the groups they belong to
-- role: a set of permissions (i.e. which actions are allowed on which resources)
+- role: a set of permissions (i.e., which actions are allowed on which resources)
 - project: a collection of namespaces within a Cluster
 
-Only users managed by external user-management systems (e.g. OpenLDAP) can be associated with groups.
+Only users managed by external user-management systems (e.g., OpenLDAP) can be associated with groups.
 
 There are three categories of roles: global, cluster, and project. Global roles are generally for Rancher-specific permissions (e.g., logging into Rancher, managing users, roles, and clusters), although the admin role also grants all Kubernetes permissions across all clusters. Cluster and project roles grant Kubernetes permissions (like those described in Kubernetes' authentication and authorization model) in addition to Rancher-specific permissions related to managing clusters and projects (e.g., managing projects within a cluster, managing cluster/project membership), respectively.
 
@@ -133,12 +133,12 @@ Under the hood, Rancher stores its settings as objects in its own dedicated Kube
 
 - there are Cluster, Project, User, GlobalRole, ClusterRole, Role, GlobalRoleBinding, ClusterRoleBinding, and RoleBinding resources
 - there are namespaces for each cluster and project
-- some associations make sense (e.g. namespaces associated with clusters contain Project resources) while others are a bit harder to understand (e.g. when are RoleBindings, ClusterRoleBindings, or GlobalRoleBindings used)
+- some associations make sense (e.g., namespaces associated with clusters contain Project resources) while others are a bit harder to understand (e.g., when are RoleBindings, ClusterRoleBindings, or GlobalRoleBindings used)
 
 Additionally, as Rancher manages Kubernetes clusters through the creation and deletion of various Kubernetes resources (e.g., ClusterRoles, ClusterRoleBindings, RoleBindings), it is important to understand how, if at all, it stays synchronized with the underlying clusters' states, which could shift beneath it.
 
 Examples of Rancher-related things to experiment with:
 
 - explore Rancher's internal state representation
-- determine Rancher's reconciliation behaviour (i.e. when and how does it query the cluster's state and reconcile against the Rancher-defined desired state)
+- determine Rancher's reconciliation behaviour (i.e., when and how does it query the cluster's state and reconcile against the Rancher-defined desired state)
 - play around with Rancher's other capabilities (e.g., application deployment and management, monitoring and alerting)

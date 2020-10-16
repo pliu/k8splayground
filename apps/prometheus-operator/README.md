@@ -25,7 +25,7 @@ Examples of things to experiment with:
 
 - understanding how metrics labels and alert labels are used by Prometheus and Alertmanager, respectively
 - add and remove labels from exported metrics
-- creating new receivers (e.g. Slack)
+- creating new receivers (e.g., Slack)
 - understand and create routing trees using label matching to route alerts
 - adding exporters to scrape metrics from new services
 - adding new alerting rules

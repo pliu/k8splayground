@@ -1,5 +1,5 @@
 # Conftest
-Conftest is a program that runs Rego checks against structured configurations (e.g. Kubernetes manifests) to surface potential issues (e.g. use of deprecated Kubernetes APIs).
+Conftest is a program that runs Rego checks against structured configurations (e.g., Kubernetes manifests) to surface potential issues (e.g., use of deprecated Kubernetes APIs).
 
 Current checks include:
 

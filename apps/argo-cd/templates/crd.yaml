@@ -1087,7 +1087,7 @@ spec:
                           type: object
                         syncOptions:
                           description: SyncOptions provide per-sync sync-options,
-                            e.g. Validate=false
+                            e.g., Validate=false
                           items:
                             type: string
                           type: array

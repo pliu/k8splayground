@@ -1,6 +1,6 @@
 projects:
   systems:
-    description: This is for systems applications (e.g. Prometheus Operator)
+    description: This is for systems applications (e.g., Prometheus Operator)
     whitelistedGitRepos:
     - 'https://github.com/pliu/k8splayground.git'
     whitelistedNamespaces:
@@ -47,7 +47,7 @@ projects:
         namespace: kube-system
 
   apps:
-    description: This is for user applications (e.g. mock server)
+    description: This is for user applications (e.g., mock server)
     whitelistedGitRepos:
     - 'https://github.com/pliu/k8splayground.git'
     whitelistedNamespaces:

@@ -35,6 +35,7 @@ fluent-bit:
   - mountPath: /fluent-bit/etc/functions.lua
     name: functions
     subPath: functions.lua
+
   functions: |
     function dedot(tag, timestamp, record)
         if record["kubernetes"] == nil then
@@ -66,43 +67,59 @@ fluent-bit:
             map[k] = v
         end
     end
+
   config:
     service: |
       [SERVICE]
-          Flush        5
-          Daemon       Off
-          Log_Level    info
-          Parsers_File parsers.conf
-          Parsers_File custom_parsers.conf
-          HTTP_Server  On
-          HTTP_Listen  0.0.0.0
-          HTTP_Port    2020
+          Flush         5
+          Daemon        Off
+          Log_Level     info
+          Parsers_File  parsers.conf
+          Parsers_File  custom_parsers.conf
+          HTTP_Server   On
+          HTTP_Listen   0.0.0.0
+          HTTP_Port     2020
+
     inputs: |
       [INPUT]
-          Name            tail
-          Path            /var/log/containers/*.log
-          Parser          docker
-          Tag             kube.*
-          Mem_Buf_Limit   5MB
-          Skip_Long_Lines On
+          Name             tail
+          Path             /var/log/containers/*.log
+          Parser           docker
+          Tag              kube.*
+          Mem_Buf_Limit    5MB
+          Skip_Long_Lines  On
+
     filters: |
       [FILTER]
-          Name                kubernetes
-          Match               kube.*
-          Merge_Log           On
-          Keep_Log            Off
-          K8S-Logging.Parser  On
-          K8S-Logging.Exclude On
+          Name                 kubernetes
+          Match                kube.*
+          Merge_Log            On
+          Keep_Log             Off
+          K8S-Logging.Parser   On
+          K8S-Logging.Exclude  On
       [FILTER]
           Name    lua
           Match   kube.*
           script  /fluent-bit/etc/functions.lua
           call    dedot
+      [FILTER]
+          Name          rewrite_tag
+          Match         kube.*
+          Rule          $kubernetes['namespace_name'] ^(kube-system)$ kube_system false
+          Emitter_Name  system_rewriter
+
     outputs: |
       [OUTPUT]
-          Name            es
-          Match           kube.*
-          Host            elasticsearch-master
-          Logstash_Format On
-          Logstash_Prefix logs
-          Retry_Limit     False
+          Name             es
+          Match            kube.*
+          Host             elasticsearch-master
+          Logstash_Format  On
+          Logstash_Prefix  fluent-general
+          Retry_Limit      False
+      [OUTPUT]
+          Name             es
+          Match            kube_system
+          Host             elasticsearch-master
+          Logstash_Format  On
+          Logstash_Prefix  fluent-system
+          Retry_Limit      False

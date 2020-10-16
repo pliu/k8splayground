@@ -67,7 +67,7 @@ mock_build:
 
 .PHONY: mock_apply
 mock_apply: mock_build
-	kubectl delete deployment mock-server
+	-kubectl delete deployment mock-server
 	helm install mock-server apps/mock-server || helm upgrade mock-server apps/mock-server
 
 .PHONY: mock_delete
