@@ -84,7 +84,6 @@ fluent-bit:
       [INPUT]
           Name             tail
           Path             /var/log/containers/*.log
-          Parser           docker
           Tag              kube.*
           Mem_Buf_Limit    5MB
           Skip_Long_Lines  On
@@ -97,11 +96,18 @@ fluent-bit:
           Keep_Log             Off
           K8S-Logging.Parser   On
           K8S-Logging.Exclude  On
+          Annotations          Off
       [FILTER]
           Name    lua
           Match   kube.*
           script  /fluent-bit/etc/functions.lua
           call    dedot
+      [FILTER]
+          Name          parser
+          Match         kube.*
+          Key_Name      log
+          Parser        cri_o
+          Reserve_Data  True
       [FILTER]
           Name          rewrite_tag
           Match         kube.*
@@ -123,3 +129,12 @@ fluent-bit:
           Logstash_Format  On
           Logstash_Prefix  fluent-system
           Retry_Limit      False
+
+    customParsers: |
+      [PARSER]
+          Name         cri_o
+          Format       regex
+          Regex        ^(?<time>[^ ]*) (?<stream>[^ ]*) [F|P] (?<log>.*)$
+          Time_Key     time
+          Time_Format  %Y-%m-%dT%H:%M:%S.%L
+          Types        stream:string log:string

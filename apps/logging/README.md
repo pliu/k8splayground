@@ -27,7 +27,7 @@ Examples of things to experiment with:
 - integrating other components of the Elasticsearch ecosystem (e.g., Filebeat, Metricbeat)
 
 ## Testing
-One can test a Fluent Bit configuration locally before rolling it out. We've provided an example configuration ("test.conf") that can be tested locally by running `fluent-bit -c apps/logging/test.conf`.
+One can test a Fluent Bit configuration locally before rolling it out. We've provided an example configuration ("test.conf") that can be tested locally by running `fluent-bit -c apps/logging/test.conf`. It is important to note that the parser modifies the timestamp associated with logs it processes to be the timestamp contained within the log itself (i.e. the time at which the log was generated) whereas, by default, the timestamp used is the time at which the log was processed by Fluent Bit.
 
 If prometheus-operator is running, Fluent Bit metrics will be viewable in Prometheus. If not, it is still possible to view any individual instance's metrics by port forwarding to the given instance (`kubectl port-forward <Pod name> -n kube-system <local port>:<the Fluent Bit server's configured port; the default is 2020>`) and then running `curl localhost:<local port>/api/v1/metrics` to get the metrics in JSON format or `curl localhost:<local port>/api/v1/metrics/prometheus` to get the metrics in Prometheus format.
 
