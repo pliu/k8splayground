@@ -44,6 +44,15 @@ prometheus-operator:
       logLevel: debug
       externalLabels:
         cluster: test
+      storageSpec:
+        volumeClaimTemplate:
+          spec:
+            storageClassName: standard
+            accessModes:
+            - ReadWriteOnce
+            resources:
+              requests:
+                storage: 30Gi
     service:
       port: 9090
 
