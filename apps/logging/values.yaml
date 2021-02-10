@@ -68,6 +68,17 @@ fluent-bit:
         end
     end
 
+    function remove_annotations(tag, timestamp, record)
+        if record["kubernetes"] == nil then
+            return 0, 0, 0
+        end
+        if record["kubernetes"]["annotations"] == nil then
+            return 0, 0, 0
+        end
+        record["kubernetes"]["annotations"] = nil
+        return 1, timestamp, record
+    end
+
   config:
     service: |
       [SERVICE]
@@ -96,7 +107,7 @@ fluent-bit:
           Keep_Log             Off
           K8S-Logging.Parser   On
           K8S-Logging.Exclude  On
-          Annotations          Off
+          Annotations          On
       [FILTER]
           Name    lua
           Match   kube.*
@@ -111,8 +122,18 @@ fluent-bit:
       [FILTER]
           Name          rewrite_tag
           Match         kube.*
+          Rule          $kubernetes['annotations']['loggingTag'] .* kube_$kubernetes['annotations']['loggingTag'] false
+          Emitter_Name  special_rewriter
+      [FILTER]
+          Name          rewrite_tag
+          Match         kube.*
           Rule          $kubernetes['namespace_name'] ^(kube-system)$ kube_system false
           Emitter_Name  system_rewriter
+      [FILTER]
+          Name    lua
+          Match   *
+          script  /fluent-bit/etc/functions.lua
+          call    remove_annotations
 
     outputs: |
       [OUTPUT]
@@ -128,6 +149,13 @@ fluent-bit:
           Host             elasticsearch-master
           Logstash_Format  On
           Logstash_Prefix  fluent-system
+          Retry_Limit      False
+      [OUTPUT]
+          Name             es
+          Match            kube_special
+          Host             elasticsearch-master
+          Logstash_Format  On
+          Logstash_Prefix  fluent-special
           Retry_Limit      False
 
     customParsers: |

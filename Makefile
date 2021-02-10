@@ -16,7 +16,7 @@ define preload_images
 endef
 
 .PHONY: kind_create
-kind_create: users_clear etcd_clear
+kind_create: kind_destroy
 	kind create cluster --config=kind/config.yaml --name $(CLUSTER_NAME) --image $(IMAGE)
 	kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/release-0.36/example/prometheus-operator-crd/monitoring.coreos.com_servicemonitors.yaml
 	make etcd_cert

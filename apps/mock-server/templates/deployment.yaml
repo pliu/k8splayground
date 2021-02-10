@@ -9,6 +9,8 @@ spec:
       app.kubernetes.io/name: {{ .Release.Name }}
   template:
     metadata:
+      annotations:
+        loggingTag: special
       labels:
         app.kubernetes.io/name: {{ .Release.Name }}
     spec:
