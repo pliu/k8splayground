@@ -245,9 +245,15 @@ distributor_run:
 	kubectl apply -f apps/distributor/templates/configmap.yaml
 	cd apps/distributor/client/bin && CONFIGMAP_NAME=distributor RUN_MODE=local go run client.go
 
+.PHONY: logging_build
+logging_build:
+	docker build -t log-generator:0.0.1 apps/logging/log-generator
+	kind load docker-image log-generator:0.0.1 --name $(CLUSTER_NAME)
+
 .PHONY: logging_apply
-logging_apply:
+logging_apply: logging_build
 	$(call preload_images,apps/logging)
+	-kubectl delete deployment logging-sidecar-test
 	helm dependency update apps/logging
 	helm install logging apps/logging -n kube-system || helm upgrade logging apps/logging -n kube-system
 

@@ -166,3 +166,72 @@ fluent-bit:
           Time_Key     time
           Time_Format  %Y-%m-%dT%H:%M:%S.%L
           Types        stream:string log:string
+
+fluentBitSidecar:
+  appName: logging-sidecar-test
+  configmapName: fluent-bit-sidecar-cm
+  namespace: default
+  config: |
+    [SERVICE]
+        Flush         5
+        Daemon        Off
+        Log_Level     info
+        Parsers_File  parsers.conf
+        Parsers_File  custom_parsers.conf
+        HTTP_Server   On
+        HTTP_Listen   0.0.0.0
+        HTTP_Port     2020
+
+    [INPUT]
+        Name              tail
+        Path              /logs/public/*.log
+        Tag               public.*
+        Mem_Buf_Limit     5MB
+        Skip_Long_Lines   On
+        Multiline         On
+        Parser_Firstline  multiline
+    [INPUT]
+        Name             tail
+        Path             /logs/protected/*.log
+        Tag              protected.*
+        Mem_Buf_Limit    5MB
+        Skip_Long_Lines  On
+
+    [FILTER]
+        Name    record_modifier
+        Match   *
+        Record  kubernetes.host ${POD_NODE}
+        Record  kubernetes.pod_name ${POD_NAME}
+        Record  kubernetes.namespace_name ${POD_NAMESPACE}
+    [FILTER]
+        Name    lua
+        Match   *
+        script  /fluent-bit/etc/functions.lua
+        call    add_tag_to_record
+
+    [OUTPUT]
+        Name             es
+        Match            public.*
+        Host             elasticsearch-master.kube-system.svc.cluster.local
+        Logstash_Format  On
+        Logstash_Prefix  sidecar-public
+        Retry_Limit      False
+    [OUTPUT]
+        Name             es
+        Match            protected.*
+        Host             elasticsearch-master.kube-system.svc.cluster.local
+        Logstash_Format  On
+        Logstash_Prefix  sidecar-protected
+        Retry_Limit      False
+
+  parsers: |
+    [PARSER]
+        Name    multiline
+        Format  regex
+        Regex   ^\d+\/\d+\/\d+ \d+\:\d+\:\d+ - (?<log>.*)$
+
+  functions: |
+    function add_tag_to_record(tag, timestamp, record)
+        record["tag"] = tag
+        return 1, timestamp, record
+    end

@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.fluentBitSidecar.appName }}
+  namespace: {{ .Values.fluentBitSidecar.namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ .Values.fluentBitSidecar.appName }}
+  template:
+    metadata:
+      annotations:
+        loggingTag: special
+      labels:
+        app.kubernetes.io/name: {{ .Values.fluentBitSidecar.appName }}
+    spec:
+      containers:
+      - image: log-generator:0.0.1
+        name: log-generator
+        args:
+        - "/logs"
+        volumeMounts:
+        - mountPath: /logs
+          name: logs
+      - image: fluent/fluent-bit:{{ (index .Values "fluent-bit").image.tag }}
+        name: fluent-bit
+        volumeMounts:
+        - mountPath: /logs
+          name: logs
+        - mountPath: /fluent-bit/etc/fluent-bit.conf
+          name: fluent-bit
+          subPath: config
+        - mountPath: /fluent-bit/etc/custom_parsers.conf
+          name: fluent-bit
+          subPath: parsers
+        - mountPath: /fluent-bit/etc/functions.lua
+          name: fluent-bit
+          subPath: functions
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: POD_NODE
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        ports:
+        - containerPort: 2020
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /
+            port: http
+            scheme: HTTP
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+      volumes:
+      - name: logs
+        emptyDir:
+          medium: Memory
+      - configMap:
+          defaultMode: 420
+          name: {{ .Values.fluentBitSidecar.configmapName }}
+        name: fluent-bit

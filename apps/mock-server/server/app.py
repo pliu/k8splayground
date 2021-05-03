@@ -19,7 +19,7 @@ def payload_dump(u_path):
     if data:
         try:
             j = json.loads(data)
-            print(json.dumps(j, indent=4), file=sys.stderr)
+            print(json.dumps(j), file=sys.stderr)
         except Exception:
             print("Could not parse", data, file=sys.stderr)
     return "You hit: %s" % u_path

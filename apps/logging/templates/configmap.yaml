@@ -5,3 +5,16 @@ data:
 kind: ConfigMap
 metadata:
   name: {{ (index (index .Values "fluent-bit").extraVolumes 0).configMap.name }}
+---
+apiVersion: v1
+data:
+  config: |
+    {{- .Values.fluentBitSidecar.config | nindent 4 }}
+  parsers: |
+    {{- .Values.fluentBitSidecar.parsers | default "" | nindent 4 }}
+  functions: |
+    {{- .Values.fluentBitSidecar.functions | default "" | nindent 4 }}
+kind: ConfigMap
+metadata:
+  name: {{ .Values.fluentBitSidecar.configmapName }}
+  namespace: {{ .Values.fluentBitSidecar.namespace }}

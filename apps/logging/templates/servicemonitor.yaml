@@ -1,0 +1,15 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ .Values.fluentBitSidecar.appName }}
+  namespace: {{ .Values.fluentBitSidecar.namespace }}
+spec:
+  endpoints:
+  - path: /api/v1/metrics/prometheus
+    port: http
+  namespaceSelector:
+    matchNames:
+    - {{ .Values.fluentBitSidecar.namespace }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ .Values.fluentBitSidecar.appName }}
