@@ -1,9 +1,0 @@
-quay.io/prometheus/alertmanager:v0.20.0
-quay.io/coreos/configmap-reload:v0.0.1
-kiwigrid/k8s-sidecar:0.1.99
-grafana/grafana:6.6.2
-quay.io/coreos/kube-state-metrics:v1.9.4
-quay.io/coreos/prometheus-operator:v0.36.0
-quay.io/prometheus/node-exporter:v0.18.1
-quay.io/coreos/prometheus-config-reloader:v0.36.0
-quay.io/prometheus/prometheus:v2.15.2

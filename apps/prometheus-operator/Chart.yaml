@@ -1,7 +1,0 @@
-apiVersion: v2
-name: prometheus-operator-playground
-version: 0.0.1
-dependencies:
-- name: prometheus-operator
-  version: 8.11.0
-  repository: https://charts.helm.sh/stable

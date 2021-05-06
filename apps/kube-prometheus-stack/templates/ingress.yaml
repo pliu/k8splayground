@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: {{ .Release.Name }}
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /prometheus(/|$)(.*)
+        backend:
+          serviceName: kube-prometheus-stack-prometheus
+          servicePort: {{ (index .Values "kube-prometheus-stack").prometheus.service.port }}
+      - path: /alertmanager(/|$)(.*)
+        backend:
+          serviceName: kube-prometheus-stack-alertmanager
+          servicePort: {{ (index .Values "kube-prometheus-stack").alertmanager.service.port }}
+      - path: /grafana(/|$)(.*)
+        backend:
+          serviceName: kube-prometheus-stack-grafana
+          servicePort: {{ (index .Values "kube-prometheus-stack").grafana.service.port }}

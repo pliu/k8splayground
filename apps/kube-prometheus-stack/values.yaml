@@ -1,4 +1,4 @@
-prometheus-operator:
+kube-prometheus-stack:
   global:
     rbac:
       pspEnabled: false
@@ -65,10 +65,9 @@ prometheus-operator:
       port: 9090
 
   prometheusOperator:
-    createCustomResource: false
     admissionWebhooks:
       enabled: false
-    tlsProxy:
+    tls:
       enabled: false
 
   kube-state-metrics:
@@ -77,7 +76,7 @@ prometheus-operator:
 
   prometheus-node-exporter:
     rbac:
-      create: false
+      pspEnabled: false
 
 alertmanagerConfig:
   url: http://mock-server.default.svc.cluster.local/

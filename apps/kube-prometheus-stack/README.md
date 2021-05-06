@@ -1,5 +1,5 @@
-# Prometheus Operator
-Prometheus Operator deploys a Prometheus-based monitoring stack that includes Grafana and Alertmanager. It also includes default metrics exporters, dashboards, and rules (we've included the metrics exporters but disabled the default rules and dashboards).
+# kube-prometheus-stack
+kube-prometheus-stack deploys a Prometheus-based monitoring stack that includes Grafana and Alertmanager. It also includes default metrics exporters, dashboards, and rules (we've included the metrics exporters but disabled the default rules and dashboards).
 
 Prometheus is a popular time-series database that is used for collecting, processing, and alerting on metrics. Specifically, applications that wish to send metrics to Prometheus expose a metrics endpoint that is periodically scraped by Prometheus exporters (the exporters are configured as part of Prometheus' configuration). Prometheus then applies a set of rules (defined in a set of YAML files) to the metrics for processing and possible alerting.
 
@@ -7,19 +7,19 @@ In the case of alerts being triggered, they are sent to Alertmanager. Alertmanag
 
 Grafana is the visualization component of the Prometheus monitoring and alerting stack. It can connect to a number of data sources, Prometheus amongst them, and render graphs, charts, tables, etc. based on queries on the metrics in the data sources. These can then be saved as dashboards for continuous display or shared with others.
 
-Prometheus Operator automates deployment of the stack by automatically providing the glue that binds the components.
+kube-prometheus-stack automates deployment of the stack by automatically providing the glue that binds the components.
 
-Prometheus' configuration is templated out and configurable through values.yaml. Exporters are configured through ServiceMonitor objects that tie an exporter to the service it is meant to scrape. Similarly, PrometheusRule objects store rules that aggregated into a ConfigMap object that is mounted by the Prometheus instance(s). In this project, PrometheusRule creation is automated based on the rules found in rules/. The base Prometheus Operator chart's default rules have been disabled, but its default exporters are enabled and can be configured in values.yaml.
+Prometheus' configuration is templated out and configurable through values.yaml. Exporters are configured through ServiceMonitor objects that tie an exporter to the service it is meant to scrape. Similarly, PrometheusRule objects store rules that aggregated into a ConfigMap object that is mounted by the Prometheus instance(s). In this project, PrometheusRule creation is automated based on the rules found in rules/. The kube-prometheus-stack chart's default rules have been disabled, but its default exporters are enabled and can be configured in values.yaml.
 
 Alertmanager's configuration (alertmanager/alertmanager.yaml) is rendered into a Secret object which is mounted by the Alertmanager instance(s).
 
-Grafana's configuration can be found in values.yaml. This is rendered by the base Prometheus Operator chart into a ConfigMap object that is mounted by the Grafana instance(s). ConfigMap objects are automatically created based on the dashboards found in dashboards/ and are imported into the Grafana instance(s). The base Prometheus Operator chart's default dashboards have been disabled.
+Grafana's configuration can be found in values.yaml. This is rendered by the kube-prometheus-stack chart into a ConfigMap object that is mounted by the Grafana instance(s). ConfigMap objects are automatically created based on the dashboards found in dashboards/ and are imported into the Grafana instance(s). The kube-prometheus-stack chart's default dashboards have been disabled.
 
 The cluster configuration (kind/config.yaml) changes the metrics bind address for kube-proxy and etcd from the default 127.0.0.1 to 0.0.0.0 so that their respective exporters can scrape their metrics.
 
 The convention for this project is for applications that wish to expose metrics via endpoints to define both their own Service and ServiceMonitor manifests (e.g., nginx-ingress, node-problem-detector). This is because a ServiceMonitor's specification depends on some application-specific context (e.g., Service labels, namespace) which the ServiceMonitors gains access to by being defined in their respective applications.
 
-As Prometheus Operator defines ServiceMonitors, this creates a dependency for applications wanting to create their own ServiceMonitors upon the Prometheus Operator chart. To resolve this, we moved ServiceMonitor CRD creation to cluster-creation time.
+As kube-prometheus-stack defines ServiceMonitors, this creates a dependency for applications wanting to create their own ServiceMonitors upon the kube-prometheus-stack chart. To resolve this, we moved ServiceMonitor CRD creation to cluster-creation time.
 
 Examples of things to experiment with:
 
@@ -46,10 +46,10 @@ To test routing rules, which can be confusing, https://prometheus.io/webtools/al
 
 ## Commands
 ```
-Apply/update Prometheus Operator:
+Apply/update kube-prometheus-stack:
 make prometheus_apply
 
-Delete Prometheus Operator:
+Delete kube-prometheus-stack:
 make prometheus_delete
 
 Test rules:

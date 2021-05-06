@@ -44,7 +44,7 @@ http://localhost/airflow/flower
 ```
 Additionally, the current and historical statuses of DAG runs and tasks can be checked in the Airflow UI. A particularly useful feature of the UI is the graphical representation of DAGs, allowing you to easily visualize task dependencies.
 
-If prometheus-operator is running, Airflow metrics will be viewable in Prometheus. If not, it is still possible to view any individual instance's metrics by port forwarding to the given instance (`kubectl port-forward <Airflow webserver Pod name> <local port>:<Airflow webserver's configured port; the default is 8080>`) and then running `curl localhost:<local port>/airflow/admin/metrics/` to get the metrics in Prometheus format.
+If kube-prometheus-stack is running, Airflow metrics will be viewable in Prometheus. If not, it is still possible to view any individual instance's metrics by port forwarding to the given instance (`kubectl port-forward <Airflow webserver Pod name> <local port>:<Airflow webserver's configured port; the default is 8080>`) and then running `curl localhost:<local port>/airflow/admin/metrics/` to get the metrics in Prometheus format.
 
 When debugging DAGs, there are a couple of places that may contain useful logs. If the DAG definition has errors or there are errors scheduling or running tasks, looking at the Airflow server, scheduler, or worker logs using `kubectl logs` is a good place to start. If the code that the task runs has errors, then you should first check the task logs in the Airflow UI.
 

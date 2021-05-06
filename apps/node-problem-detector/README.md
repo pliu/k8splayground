@@ -5,7 +5,7 @@ It uses a daemon set to deploy onto all eligible nodes. The kind config specifie
 
 The Pods then mount a ConfigMap object containing the test configurations and custom test scripts. If using custom test scripts, a non-zero return value indicates failure while a return value of 0 indicates the test passed. Additionally, it mounts /usr from the host's filesystem (the Docker "host", not the local machine), giving it access to the binaries in that path.
 
-When tests fail, node problem detector emits events or marks the affected node with a condition. Node problem detector also has a metrics endpoint that exposes test status (problem_gauge) and failure counts (problem_counter) that is scraped by Prometheus (see prometheus-operator).
+When tests fail, node problem detector emits events or marks the affected node with a condition. Node problem detector also has a metrics endpoint that exposes test status (problem_gauge) and failure counts (problem_counter) that is scraped by Prometheus (see kube-prometheus-stack).
 
 Examples of things to experiment with:
 
@@ -18,7 +18,7 @@ Examples of things to experiment with:
 ## Testing
 Describing a node would show any conditions or events attached to it by the node problem detector.
 
-If prometheus-operator is running, the metrics will be viewable in Prometheus. If not, it is still possible to view any individual instance's metrics by port forwarding to the given instance (`kubectl port-forward <Pod name> -n kube-system <local port>:<node problem detector's configured metrics port; currently set to 5678>`) and then running `curl localhost:<local port>/metrics` to get the metrics in Prometheus format.
+If kube-prometheus-stack is running, the metrics will be viewable in Prometheus. If not, it is still possible to view any individual instance's metrics by port forwarding to the given instance (`kubectl port-forward <Pod name> -n kube-system <local port>:<node problem detector's configured metrics port; currently set to 5678>`) and then running `curl localhost:<local port>/metrics` to get the metrics in Prometheus format.
 
 To determine if mounting is working as intended, one can exec into the container to inspect the filesystem.
 

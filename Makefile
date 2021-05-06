@@ -18,7 +18,7 @@ endef
 .PHONY: kind_create
 kind_create: kind_destroy
 	kind create cluster --config=kind/config.yaml --name $(CLUSTER_NAME) --image $(IMAGE)
-	kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/release-0.36/example/prometheus-operator-crd/monitoring.coreos.com_servicemonitors.yaml
+	kubectl apply -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.47.0/example/prometheus-operator-crd/monitoring.coreos.com_servicemonitors.yaml
 	make etcd_cert
 
 .PHONY: kind_destroy
@@ -41,24 +41,25 @@ npd_delete:
 
 .PHONY: prometheus_apply
 prometheus_apply:
-	kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/release-0.36/example/prometheus-operator-crd/monitoring.coreos.com_alertmanagers.yaml
-	kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/release-0.36/example/prometheus-operator-crd/monitoring.coreos.com_podmonitors.yaml
-	kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/release-0.36/example/prometheus-operator-crd/monitoring.coreos.com_prometheuses.yaml
-	kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/release-0.36/example/prometheus-operator-crd/monitoring.coreos.com_prometheusrules.yaml
-	kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/release-0.36/example/prometheus-operator-crd/monitoring.coreos.com_thanosrulers.yaml
-	$(call preload_images,apps/prometheus-operator)
-	helm dependency update apps/prometheus-operator
-	helm install prometheus-operator apps/prometheus-operator || helm upgrade prometheus-operator apps/prometheus-operator
+	kubectl apply -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.47.0/example/prometheus-operator-crd/monitoring.coreos.com_alertmanagerconfigs.yaml
+	kubectl apply -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.47.0/example/prometheus-operator-crd/monitoring.coreos.com_alertmanagers.yaml
+	kubectl apply -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.47.0/example/prometheus-operator-crd/monitoring.coreos.com_podmonitors.yaml
+	kubectl apply -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.47.0/example/prometheus-operator-crd/monitoring.coreos.com_probes.yaml
+	kubectl apply -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.47.0/example/prometheus-operator-crd/monitoring.coreos.com_prometheuses.yaml
+	kubectl apply -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.47.0/example/prometheus-operator-crd/monitoring.coreos.com_thanosrulers.yaml
+	$(call preload_images,apps/kube-prometheus-stack)
+	helm dependency update apps/kube-prometheus-stack
+	helm install kube-prometheus-stack apps/kube-prometheus-stack || helm upgrade kube-prometheus-stack apps/kube-prometheus-stack
 
 .PHONY: prometheus_delete
 prometheus_delete:
-	helm uninstall prometheus-operator
-	kubectl delete service prometheus-operator-kubelet -n kube-system
+	helm uninstall kube-prometheus-stack
+	kubectl delete service kube-prometheus-stack-kubelet -n kube-system
 
 .PHONY: prometheus_test_rules
 prometheus_test_rules:
-	find apps/prometheus-operator/rules -type f -name '*.yaml' -not -name '*_test.yaml' -exec promtool check rules {} +
-	find apps/prometheus-operator/rules -type f -name '*_test.yaml' -exec promtool test rules {} +
+	find apps/kube-prometheus-stack/rules -type f -name '*.yaml' -not -name '*_test.yaml' -exec promtool check rules {} +
+	find apps/kube-prometheus-stack/rules -type f -name '*_test.yaml' -exec promtool test rules {} +
 
 .PHONY: mock_build
 mock_build:
@@ -172,14 +173,24 @@ endif
 permissions_delete:
 	kubectl delete rolebindings -A -l k8splayground-selector=permissions
 
+.PHONY: argo_notifications_apply
+argo_notifications_apply:
+	$(call preload_images,apps/argo-cd-notifications)
+	helm install -n argo-cd argo-cd-notifications apps/argo-cd-notifications || helm upgrade -n argo-cd-notifications argo-cd apps/argo-cd-notifications
+
+.PHONY: argo_notifications_delete
+argo_notifications_delete:
+	helm uninstall -n argo-cd argo-cd-notifications
+
 .PHONY: argo_apply
 argo_apply:
 	-kubectl create namespace argo-cd
+# make argo_notifications_apply
 	$(call preload_images,apps/argo-cd)
 	helm install -n argo-cd argo-cd apps/argo-cd || helm upgrade -n argo-cd argo-cd apps/argo-cd
 
 .PHONY: apps_apply
-apps_apply: mock_build distributor_build
+apps_apply: mock_build distributor_build logging_build
 	-kubectl create namespace distributor
 	-for app_path in $(sort $(dir $(wildcard apps/*/))) ; do \
 	  $(call preload_images,$$app_path); \
@@ -187,7 +198,7 @@ apps_apply: mock_build distributor_build
 	helm install -n argo-cd argo-apps apps/argo-apps || helm upgrade -n argo-cd argo-apps apps/argo-apps
 
 .PHONY: argo_delete
-argo_delete:
+argo_delete: # argo_notifications_delete
 	helm uninstall -n argo-cd argo-cd
 	kubectl delete namespace argo-cd
 

@@ -22,7 +22,7 @@ docker 19.03.6
 kind 0.7.0 (0.7.0+ is required for disk access)
 helm v3.1.1 (v3+ is required due to folding requirements.yaml into Chart.yaml)
 kubectl 1.17.3
-promtool (for Prometheus operator rules' tests)
+promtool (for Prometheus rules' tests)
 conftest 0.17.1 (for checking Helm-generated manifests against Rego rules)
 kubectl-krew v0.3.4 (for installing kubectl plugins)
 terraform v0.12.24
@@ -82,14 +82,15 @@ The kind folder contains the cluster configuration (config.yaml).
 Current applications include:
 - [NGINX Ingress](apps/nginx-ingress/README.md)
 - [Argo CD](apps/argo-cd/README.md)
-- [Prometheus Operator](apps/prometheus-operator/README.md)
+- [kube-prometheus-stack](apps/kube-prometheus-stack/README.md)
 - [node-problem-detector](apps/node-problem-detector/README.md)
 - [mock server](apps/mock-server/README.md)
 - [Airflow](apps/airflow/README.md)
 - [distributor](apps/distributor/README.md)
 - [logging](apps/logging/README.md)
+- [Argo CD Notifications](apps/argo-cd-notifications/README.md)
 
-Each application folder contains, at the very least, its own README - with more information on what the application does and how to use it - and Chart.yaml. The Chart.yaml contains some basic metadata about the chart (the package of Kubernetes manifests that defines the Kubernetes objects required to deploy the application) such as name, version, and any dependencies. In addition, it may contain a templates folder that contains the templates from which the actual manifests are rendered. The values used in the rendering are found in the values.yaml file. If none of the templates require rendering, then no values.yaml is needed (e.g., mock-server). If including another chart as a dependency, one can configure the imported chart using the values.yaml file (e.g., prometheus-operator, nginx-ingress).
+Each application folder contains, at the very least, its own README - with more information on what the application does and how to use it - and Chart.yaml. The Chart.yaml contains some basic metadata about the chart (the package of Kubernetes manifests that defines the Kubernetes objects required to deploy the application) such as name, version, and any dependencies. In addition, it may contain a templates folder that contains the templates from which the actual manifests are rendered. The values used in the rendering are found in the values.yaml file. If none of the templates require rendering, then no values.yaml is needed (e.g., mock-server). If including another chart as a dependency, one can configure the imported chart using the values.yaml file (e.g., kube-prometheus-stack, nginx-ingress).
 
 auth contains documentation and tools to learn about authentication and authorization in Kubernetes and Rancher, an external cluster manager. The scripts folder contains helper scripts related to user creation and permissioning through Kubernetes and accessing Kubernetes directly as these newly-created users. The config folder contains the kubeconfig files for these users. Documentation related to authentication and authorization can be found [here](auth/README.md). Additionally, Terraform can be used to manage Rancher with examples located in the terraform folder (with documentation [here](auth/terraform/README.md)).
 

@@ -3,5 +3,5 @@ data:
   alertmanager.yaml: {{ tpl (.Files.Get "alertmanager/alertmanager.yaml") . | b64enc | quote }}
 kind: Secret
 metadata:
-  name: {{ (index .Values "prometheus-operator").alertmanager.alertmanagerSpec.configSecret }}
+  name: {{ (index .Values "kube-prometheus-stack").alertmanager.alertmanagerSpec.configSecret }}
 type: Opaque

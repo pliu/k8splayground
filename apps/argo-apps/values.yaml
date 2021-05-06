@@ -1,6 +1,6 @@
 projects:
   systems:
-    description: This is for systems applications (e.g., Prometheus Operator)
+    description: This is for systems applications (e.g., kube-prometheus-stack)
     whitelistedGitRepos:
     - 'https://github.com/pliu/k8splayground.git'
     whitelistedNamespaces:
@@ -22,11 +22,11 @@ projects:
           targetRevision: master
           path: apps/node-problem-detector
         namespace: kube-system
-      prometheus-operator:
+      kube-prometheus-stack:
         source:
           repoURL: https://github.com/pliu/k8splayground.git
           targetRevision: master
-          path: apps/prometheus-operator
+          path: apps/kube-prometheus-stack
         namespace: default
         ignoreDifferences:
         - group: apiextensions.k8s.io
