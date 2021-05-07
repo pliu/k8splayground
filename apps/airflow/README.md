@@ -37,7 +37,7 @@ Examples of things to experiment with:
 - understanding how Celery distributes and retries, if necessary, tasks to workers
 
 ## Testing
-If nginx-ingress is running, Airflow configuration changes and DAG changes can be verified from the Airflow UI on one's local machine. The Flower UI can be used to verify worker configuration changes and to track tasks in the Celery queue.
+If nginx-ingress is running, Airflow configuration changes and DAG changes can be verified from the Airflow UI on one's local machine (the username/password is admin/password). The Flower UI can be used to verify worker configuration changes and to track tasks in the Celery queue.
 ```
 http://localhost/airflow
 http://localhost/airflow/flower

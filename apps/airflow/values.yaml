@@ -4,16 +4,21 @@ airflow:
     - airflow-exporter
     config:
       AIRFLOW__WEBSERVER__EXPOSE_CONFIG: "True"
+      AIRFLOW__WEBSERVER__BASE_URL: "http://localhost/airflow"
+      AIRFLOW__CELERY__FLOWER_URL_PREFIX: "/airflow/flower"
+    users:
+    - username: admin
+      password: password
+      role: Admin
+      email: admin@example.com
+      firstName: admin
+      lastName: admin
 
   serviceMonitor:
     enabled: true
     path: /airflow/admin/metrics
 
-  flower:
-    urlPrefix: /airflow/flower
-
   web:
-    baseUrl: http://localhost/airflow
     livenessProbe:
       initialDelaySeconds: 40
       failureThreshold: 3
@@ -26,18 +31,14 @@ airflow:
     web:
       path: /airflow
     flower:
-      path: /airflow/flower(/|$)(.*)
-      annotations:
-        nginx.ingress.kubernetes.io/rewrite-target: /$2
+      path: /airflow/flower
 
   dags:
-    git:
-      url: https://github.com/pliu/k8splayground.git
-      ref: master
-
-      gitSync:
-        enabled: true
-        refreshTime: 60
+    gitSync:
+      enabled: true
+      repo: https://github.com/pliu/k8splayground.git
+      branch: master
+      syncWait: 60
 
   workers:
     tolerations:
@@ -45,5 +46,3 @@ airflow:
       operator: Exists
       effect: NoSchedule
     replicas: 2
-    celery:
-      instances: 4

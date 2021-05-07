@@ -1,5 +1,5 @@
 from airflow import DAG
-from datetime import timedelta
+from datetime import datetime, timedelta
 from airflow.operators.bash_operator import BashOperator
 from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.python_operator import BranchPythonOperator
@@ -11,7 +11,7 @@ import sys
 default_args = {
     'owner': 'airflow',
     'depends_on_past': False,
-    'start_date': '2020-06-07T00:00:00.00000+00:00',
+    'start_date': datetime(2020, 6, 7),
     'email_on_failure': False,
     'email_on_retry': False,
     'retries': 1,
