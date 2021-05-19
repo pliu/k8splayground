@@ -264,7 +264,7 @@ logging_build:
 .PHONY: logging_apply
 logging_apply: logging_build
 	$(call preload_images,apps/logging)
-	-kubectl delete deployment logging-sidecar-test
+	-kubectl delete statefulset logging-sidecar-test
 	helm dependency update apps/logging
 	helm install logging apps/logging -n kube-system || helm upgrade logging apps/logging -n kube-system
 

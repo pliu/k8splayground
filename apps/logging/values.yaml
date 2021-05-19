@@ -203,6 +203,7 @@ fluentBitSidecar:
         Record  kubernetes.host ${POD_NODE}
         Record  kubernetes.pod_name ${POD_NAME}
         Record  kubernetes.namespace_name ${POD_NAMESPACE}
+        Record  app.name ${APP_NAME}
     [FILTER]
         Name    lua
         Match   *

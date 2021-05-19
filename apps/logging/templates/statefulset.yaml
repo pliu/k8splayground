@@ -1,10 +1,11 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: {{ .Values.fluentBitSidecar.appName }}
   namespace: {{ .Values.fluentBitSidecar.namespace }}
 spec:
   replicas: 1
+  serviceName: {{ .Values.fluentBitSidecar.appName }}
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ .Values.fluentBitSidecar.appName }}
@@ -15,6 +16,16 @@ spec:
       labels:
         app.kubernetes.io/name: {{ .Values.fluentBitSidecar.appName }}
     spec:
+      initContainers:
+      - image: python:2.7-alpine
+        name: log-cleaner
+        command:
+        - "sh"
+        - "-c"
+        - "rm -rf /logs/*"
+        volumeMounts:
+        - mountPath: /logs
+          name: logs
       containers:
       - image: log-generator:0.0.1
         name: log-generator
@@ -23,7 +34,11 @@ spec:
         volumeMounts:
         - mountPath: /logs
           name: logs
-      - image: fluent/fluent-bit:{{ (index .Values "fluent-bit").image.tag }}
+      - image: fluent/fluent-bit:{{ (index .Values "fluent-bit").image.tag }}-debug
+        command:
+        - "sh"
+        - "-c"
+        - "trap 'echo SIGTERM received' TERM; /fluent-bit/bin/fluent-bit -c /fluent-bit/etc/fluent-bit.conf;"
         name: fluent-bit
         volumeMounts:
         - mountPath: /logs
@@ -50,6 +65,8 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: spec.nodeName
+        - name: APP_NAME
+          value: {{ .Values.fluentBitSidecar.appName }}
         ports:
         - containerPort: 2020
           name: http
@@ -63,11 +80,19 @@ spec:
           periodSeconds: 10
           successThreshold: 1
           timeoutSeconds: 1
+      terminationGracePeriodSeconds: 60
       volumes:
-      - name: logs
-        emptyDir:
-          medium: Memory
       - configMap:
           defaultMode: 420
           name: {{ .Values.fluentBitSidecar.configmapName }}
         name: fluent-bit
+  volumeClaimTemplates:
+  - metadata:
+      name: logs
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      storageClassName: standard
+      resources:
+        requests:
+          storage: 10Mi
