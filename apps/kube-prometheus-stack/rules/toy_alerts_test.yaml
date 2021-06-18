@@ -36,6 +36,16 @@ tests:
       exp_annotations:
         message: "Problem counter high on b: 8"
         test: "This is an external label: test"
+  - eval_time: 7m
+    alertname: ProblemCounterHigh
+    exp_alerts:
+    - exp_labels:
+        severity: critical
+        reason: TempProblem2
+        nodeName: b
+      exp_annotations:
+        message: "Problem counter high on b: 9"
+        test: "This is an external label: test"
 
   external_labels:
     cluster: test
