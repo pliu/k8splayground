@@ -12,6 +12,9 @@ spec:
       labels:
         app.kubernetes.io/name: {{ .Release.Name }}
     spec:
+      securityContext:
+        runAsUser: 999
+        runAsGroup: 999
       tolerations:
       - key: playground_test
         operator: Exists
@@ -21,3 +24,11 @@ spec:
       containers:
       - image: mock-server:0.0.1
         name: {{ .Release.Name }}
+        volumeMounts:
+        - mountPath: /test-tmp
+          name: host-tmp
+      volumes:
+      - name: host-tmp
+        hostPath:
+          path: /tmp
+          type: Directory
