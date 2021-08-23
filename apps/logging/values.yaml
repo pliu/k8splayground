@@ -130,6 +130,11 @@ fluent-bit:
           Rule          $kubernetes['namespace_name'] ^(kube-system)$ kube_system false
           Emitter_Name  system_rewriter
       [FILTER]
+          Name          rewrite_tag
+          Match         kube_system
+          Rule          $kubernetes['container_name'] ^(public)$ public_index false
+          Emitter_Name  public_rewriter
+      [FILTER]
           Name    lua
           Match   *
           script  /fluent-bit/etc/functions.lua
@@ -156,6 +161,13 @@ fluent-bit:
           Host             elasticsearch-master
           Logstash_Format  On
           Logstash_Prefix  fluent-special
+          Retry_Limit      False
+      [OUTPUT]
+          Name             es
+          Match            public_index
+          Host             elasticsearch-master
+          Logstash_Format  On
+          Logstash_Prefix  fluent-public
           Retry_Limit      False
 
     customParsers: |

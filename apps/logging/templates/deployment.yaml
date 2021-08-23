@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-container-name-routing-test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ .Release.Name }}-container-name-routing-test
+  template:
+    metadata:
+      annotations:
+        fluentbit.io/exclude: "true"
+        fluentbit.io/exclude-default: "false"
+        fluentbit.io/exclude-public: "false"
+      labels:
+        app.kubernetes.io/name: {{ .Release.Name }}-container-name-routing-test
+    spec:
+      containers:
+      - image: busybox:1.31
+        name: default
+        command: ["/bin/sh", "-c", "while :; do echo 'default'; sleep 30 ; done"]
+      - image: busybox:1.31
+        name: public
+        command: ["/bin/sh", "-c", "while :; do echo 'public'; sleep 30 ; done"]
+      - image: busybox:1.31
+        name: excluded
+        command: ["/bin/sh", "-c", "while :; do echo 'excluded'; sleep 30 ; done"]
