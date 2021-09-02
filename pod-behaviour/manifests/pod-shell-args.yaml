@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: shell-args
+spec:
+  containers:
+  - name: shell-args
+    image: small-entrypoint-shell:0.0.1
+    args:
+    - "--timed"

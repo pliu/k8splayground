@@ -7,4 +7,5 @@ WORKDIR /app
 
 COPY app.py /app/app.py
 
+CMD ["--timed"]
 ENTRYPOINT python app.py
