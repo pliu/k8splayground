@@ -22,12 +22,20 @@ resource "rancher2_project" "default" {
   name       = "Default"
 }
 
-# Create "Test" project with a namespaces "test1" and "test2"
+# Create "Test" project containing a namespace of the same name (lowercased)
 module "test_project" {
-  source     = "./project"
+  source     = "./project1"
   name       = "Test"
   cluster_id = rancher2_cluster.test.id
-  namespaces = ["test1", "test2"]
+  resource_quota = {
+    limits_cpu = "3"
+  }
+}
+
+module "test_project2" {
+  source     = "./project1"
+  name       = "Test2"
+  cluster_id = rancher2_cluster.test.id
 }
 
 # Create "test" user

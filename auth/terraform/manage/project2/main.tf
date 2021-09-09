@@ -8,10 +8,10 @@ variable "cluster_id" {
   description = "The id of the cluster to which the project belongs"
 }
 
-variable "namespaces" {
-  type        = set(string)
-  description = "A list of namespaces to be created under this project"
-  default     = []
+variable "resource_quota" {
+  type        = map(string)
+  description = "Resource quota for the namespace"
+  default     = null
 }
 
 # Create the project with the specified name under the given cluster
@@ -20,10 +20,9 @@ resource "rancher2_project" "project" {
   name       = var.name
 }
 
-# Loop through "namespaces", creating each namespace under the project
+# Create the namespace associated with the project
 resource "rancher2_namespace" "namespace" {
-  for_each   = var.namespaces
-  name       = each.value
+  name       = lower(var.name)
   project_id = rancher2_project.project.id
 }
 

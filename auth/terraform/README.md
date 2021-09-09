@@ -15,12 +15,13 @@ Examples of things to experiment with:
 
 - setting up Terraform's local state
 - creating and deleting Rancher resources (and in some cases, by extension, Kubernetes resources) through Terraform
-- observing what happens to manually-changed Rancher resources that are managed by Terraform on the next terraform apply
+- observing what happens to manually-changed Rancher resources that are managed by Terraform on the next apply
 - creating and calling Terraform modules
 - importing unmanaged Rancher resources to be managed by Terraform
 - selectively applying Terraform resources
 - removing Rancher resources from being managed by Terraform
 - using workspaces to isolate Terraform states
+- understanding how Terraform tracks Rancher resources it is managing (e.g., how to swap modules without recreating resources managed by the first module)
 
 ## Managing Rancher through Terraform
 We use Terraform to bootstraps Rancher (auth/terraform/init), setting Rancher's API endpoint and admin password and retrieving an API token for subsequent communication between Terraform and Rancher (the admin password is set to `password` should you wish to log in to Rancher's UI). The initialization Makefile target (`make rancher_tf_init`) generates provider.tf from provider.template in auth/terraform/manage, populating the provider with the API token.
