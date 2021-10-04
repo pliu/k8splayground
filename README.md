@@ -29,7 +29,7 @@ terraform v0.12.24
 provider.rancher2 v1.8.3 (for managing Rancher through Terraform)
 etcdctl 3.4.9
 lens 3.5.1
-go 1.13.5
+go 1.13.5, 1.17.1
 fluent-bit v1.5.6
 ```
 

@@ -8,12 +8,16 @@ spec:
   - port: {{ .Values.metrics_port_name }}
     metricRelabelings:
     - action: labelkeep
-      regex: __name__|endpoint|nodeName|reason|service
+      regex: __name__|endpoint|nodeName|reason|service|env
+    - targetLabel: test
+      replacement: test
     relabelings:
     - action: replace
       sourceLabels:
       - __meta_kubernetes_pod_node_name
       targetLabel: nodeName
+    - targetLabel: env
+      replacement: dev
   namespaceSelector:
     matchNames:
     - {{ .Release.Namespace }}

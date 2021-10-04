@@ -24,7 +24,7 @@ As kube-prometheus-stack defines ServiceMonitors, this creates a dependency for 
 Examples of things to experiment with:
 
 - understanding how metrics labels and alert labels are used by Prometheus and Alertmanager, respectively
-- add and remove labels from exported metrics
+- add and remove labels from exported metrics (note the order of operations between relabelings and metricRelabelings at the ServiceMonitor level and externalLabels at the Prometheus level as well as the effect of relabelings and metricRelabelings on automatically generated metrics such as `up`; the ServiceMonitor in the node-problem-detector app illustrates the above)
 - creating new receivers (e.g., Slack)
 - understand and create routing trees using label matching to route alerts
 - adding exporters to scrape metrics from new services
