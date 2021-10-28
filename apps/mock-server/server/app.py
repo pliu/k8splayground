@@ -8,7 +8,7 @@ app = Flask(__name__)
 
 
 def receiveSignal(signalNumber, frame):
-    print("Received", signalNumber, file=sys.stderr)
+    print("Received", signalNumber)
     exit(0)
 
 
@@ -19,7 +19,7 @@ def payload_dump(u_path):
     if data:
         try:
             j = json.loads(data)
-            print(json.dumps(j), file=sys.stderr)
+            print(json.dumps(j))
         except Exception:
             print("Could not parse", data, file=sys.stderr)
     return "You hit: %s" % u_path

@@ -18,6 +18,8 @@ endef
 .PHONY: kind_create
 kind_create: kind_destroy
 	kind create cluster --config=kind/config.yaml --name $(CLUSTER_NAME) --image $(IMAGE)
+	kubectl apply -f https://docs.projectcalico.org/v3.8/manifests/calico.yaml
+	kubectl set env daemonset/calico-node FELIX_LOGSEVERITYSCREEN=warning -n kube-system
 	kubectl apply -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.47.0/example/prometheus-operator-crd/monitoring.coreos.com_servicemonitors.yaml
 	make etcd_cert
 
@@ -167,19 +169,9 @@ endif
 permissions_delete:
 	kubectl delete rolebindings -A -l k8splayground-selector=permissions
 
-.PHONY: argo_notifications_apply
-argo_notifications_apply:
-	$(call preload_images,apps/argo-cd-notifications)
-	helm install -n argo-cd argo-cd-notifications apps/argo-cd-notifications || helm upgrade -n argo-cd-notifications argo-cd apps/argo-cd-notifications
-
-.PHONY: argo_notifications_delete
-argo_notifications_delete:
-	helm uninstall -n argo-cd argo-cd-notifications
-
 .PHONY: argo_apply
 argo_apply:
 	-kubectl create namespace argo-cd
-# make argo_notifications_apply
 	$(call preload_images,apps/argo-cd)
 	helm install -n argo-cd argo-cd apps/argo-cd || helm upgrade -n argo-cd argo-cd apps/argo-cd
 
@@ -192,7 +184,7 @@ apps_apply: mock_build distributor_build logging_build
 	helm install -n argo-cd argo-apps apps/argo-apps || helm upgrade -n argo-cd argo-apps apps/argo-apps
 
 .PHONY: argo_delete
-argo_delete: # argo_notifications_delete
+argo_delete:
 	helm uninstall -n argo-cd argo-cd
 	kubectl delete namespace argo-cd
 
@@ -265,3 +257,9 @@ logging_apply: logging_build
 .PHONY: logging_delete
 logging_delete:
 	helm uninstall logging -n kube-system
+
+.PHONY: network_policy_setup
+network_policy_setup:
+	docker build -t curl:0.0.1 -f k8s-behaviour/containers/Dockerfile_curl k8s-behaviour/containers
+	kind load docker-image curl:0.0.1 --name k8splayground
+	kubectl apply -f k8s-behaviour/manifests/network-policy-setup.yaml

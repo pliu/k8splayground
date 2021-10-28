@@ -1,5 +1,7 @@
 FROM python:2.7-alpine
 
+ENV PYTHONUNBUFFERED=0
+
 COPY requirements.txt /app/requirements.txt
 
 WORKDIR /app

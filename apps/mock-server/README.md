@@ -11,7 +11,7 @@ Examples of things to experiment with:
 - the self-healing properties of deployments
 - different rollout strategies on the deployment when deploying a new version of mock server
 - how to route Kubernetes-internal traffic to the mock-server Pods through its service
-- how the Dockerfile definition translates to layers in a Docker image and the effect of layers (requires changing the Makefile)
+- how the Dockerfile definition translates to layers in a Docker image and the effect of layers (requires changing the Dockerfile)
 
 For how ingress works, see the nginx-ingress application's README.
 

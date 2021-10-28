@@ -2,6 +2,8 @@ FROM python:2.7-alpine
 
 STOPSIGNAL SIGINT
 
+ENV PYTHONUNBUFFERED=0
+
 WORKDIR /app
 
 COPY app.py /app/app.py

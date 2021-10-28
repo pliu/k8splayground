@@ -1,7 +1,7 @@
 # K8sPlayground
 K8sPlayground is a kind-based (Kubernetes in Docker) environment built to facilitate experimentation with a tight feedback loop, thus accelerating learning and understanding of containers, Kubernetes, and related tooling and applications.
 
-As its name suggests, kind works by spinning up Docker containers to act as "hosts" in a Kubernetes cluster. These Docker "hosts" are subsequently managed by kubeadm to set up Kubernetes components (e.g., kubelet, etcd, api-server, controller-manager, scheduler, kindnet [CNI implementation], coreDNS, kube-proxy).
+As its name suggests, kind works by spinning up Docker containers to act as "hosts" in a Kubernetes cluster. These Docker "hosts" are subsequently managed by kubeadm to set up Kubernetes components (e.g., kubelet, etcd, api-server, controller-manager, scheduler, coreDNS, kube-proxy). We have disabled kindnet - the default kind CNI plugin - in favor of using Calico, which is installed as part of the Makefile target after the kind cluster is created.
 
 When the cluster is started, localhost ports 80 and 443 will be mapped to one of the Docker worker "hosts" and localhost port 2379 will be mapped to the Docker control plane "host" (specified in kind/config.yaml).
 
@@ -41,37 +41,26 @@ root
 |     |- templates?
 |     |  |- ...
 |     |- Chart.yaml
-|     |- images?
 |     |- README.md?
 |     |- values.yaml?
+|     |- ...
 |- auth
-|  |- config
-|  |  |- ...
-|  |- scripts
-|  |  |- ...
 |  |- terraform
-|  |- |- init
-|  |  |  |- ...
-|  |  |- manage
-|  |  |  |- ...
 |  |  |- README.md
-|  |- images
+|  |  |- ...
 |  |- README.md
+|  |- ...
 |- conftest-checks
 |  |- README.md
 |  |- ...
 |- k8s-behaviour
-|  |- manifests
-|  |  |- ...
 |  |- README.md
+|  |- ...
 |- kind
 |  |- config.yaml
 |- pod-behaviour
-|  |- containers
-|  |  |- ...
-|  |- manifests
-|  |  |- ...
 |  |- README.md
+|  |- ...
 |- Makefile
 |- README.md
 ```
@@ -86,7 +75,6 @@ Current applications include:
 - [Airflow](apps/airflow/README.md)
 - [distributor](apps/distributor/README.md)
 - [logging](apps/logging/README.md)
-- [Argo CD Notifications](apps/argo-cd-notifications/README.md)
 
 Each application folder contains, at the very least, its own README - with more information on what the application does and how to use it - and Chart.yaml. The Chart.yaml contains some basic metadata about the chart (the package of Kubernetes manifests that defines the Kubernetes objects required to deploy the application) such as name, version, and any dependencies. In addition, it may contain a templates folder that contains the templates from which the actual manifests are rendered. The values used in the rendering are found in the values.yaml file. If none of the templates require rendering, then no values.yaml is needed (e.g., mock-server). If including another chart as a dependency, one can configure the imported chart using the values.yaml file (e.g., kube-prometheus-stack, nginx-ingress).
 

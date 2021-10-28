@@ -3,6 +3,8 @@ FROM ubuntu:18.04
 RUN apt-get update -y && \
     apt-get install -y python-pip python-dev
 
+ENV PYTHONUNBUFFERED=0
+
 WORKDIR /app
 
 COPY app.py /app/app.py

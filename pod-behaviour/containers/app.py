@@ -16,15 +16,15 @@ def exitHelper():
     if args.timed:
         for i in range(30):
             time.sleep(1)
-            print(time.strftime("%H:%M:%S", time.localtime()), file=sys.stderr)
+            print(time.strftime("%H:%M:%S", time.localtime()))
         time.sleep(30)
-        print(time.strftime("%H:%M:%S", time.localtime()), file=sys.stderr)
+        print(time.strftime("%H:%M:%S", time.localtime()))
         exit(0 if not args.error else 1)
     exit(0 if not args.error else 1)
 
 
 def receiveSignal(signalNumber, frame):
-    print("Received", signalNumber, file=sys.stderr)
+    print("Received", signalNumber)
     if not args.sigint and signalNumber == signal.SIGTERM :
         exitHelper()
     elif args.sigint and signalNumber == signal.SIGINT:
@@ -48,8 +48,8 @@ if __name__ == '__main__':
     signal.signal(signal.SIGPIPE, receiveSignal)
     signal.signal(signal.SIGALRM, receiveSignal)
     signal.signal(signal.SIGTERM, receiveSignal)
-    print('SIGINT' if args.sigint else 'SIGTERM', file=sys.stderr)
-    print('Timed exit' if args.timed else 'Immediate exit', file=sys.stderr)
-    print('Non-zero exit code' if args.error else 'Zero exit code', file=sys.stderr)
+    print('SIGINT' if args.sigint else 'SIGTERM')
+    print('Timed exit' if args.timed else 'Immediate exit')
+    print('Non-zero exit code' if args.error else 'Zero exit code')
     while True:
         time.sleep(30)
