@@ -43,7 +43,7 @@ def print_logs(path_prefix):
     log_file1 = safe_open_w(path1)
     log_file2 = safe_open_w(path2)
     log_file2.write(datetime.now().strftime("%d/%m/%Y %H:%M:%S") + " - This is the start\n")
-    for i in xrange(100):
+    for i in xrange(5):
         log_file1.write(str(i) + "\n")
         log_file2.write(str(i) + "\n")
     time.sleep(1)
