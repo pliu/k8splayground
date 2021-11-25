@@ -1,5 +1,5 @@
 CLUSTER_NAME=k8splayground
-IMAGE=kindest/node:v1.18.2
+KIND_IMAGE=kindest/node:v1.21.2
 RANCHER_CONTAINER_NAME=$(CLUSTER_NAME)-rancher
 RANCHER_HOST=$$(docker inspect $(RANCHER_CONTAINER_NAME) -f '{{ json .NetworkSettings.Networks.bridge.IPAddress }}')
 RANCHER_PORT=444
@@ -17,7 +17,7 @@ endef
 
 .PHONY: kind_create
 kind_create: kind_destroy
-	kind create cluster --config=kind/config.yaml --name $(CLUSTER_NAME) --image $(IMAGE)
+	kind create cluster --config=kind/config.yaml --name $(CLUSTER_NAME) --image $(KIND_IMAGE)
 	kubectl apply -f https://docs.projectcalico.org/v3.8/manifests/calico.yaml
 	kubectl set env daemonset/calico-node FELIX_LOGSEVERITYSCREEN=warning -n kube-system
 	kubectl apply -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.47.0/example/prometheus-operator-crd/monitoring.coreos.com_servicemonitors.yaml

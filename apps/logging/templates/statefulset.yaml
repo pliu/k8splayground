@@ -34,7 +34,7 @@ spec:
         volumeMounts:
         - mountPath: /logs
           name: logs
-      - image: fluent/fluent-bit:{{ (index .Values "fluent-bit").image.tag }}-debug
+      - image: fluent/fluent-bit:{{ (index .Values "fluent-bit").image.tag }}
         command:
         - "sh"
         - "-c"
