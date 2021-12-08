@@ -1,5 +1,6 @@
 #!/bin/bash
 
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 USER=$1
 if [[ -n "$2" ]] ; then
     IFS=',' read -ra GROUPS <<< "$2"
@@ -50,11 +51,19 @@ kubectl config view -o jsonpath='{.clusters[0].cluster.certificate-authority-dat
 
 # Create kubeconfig
 kubectl config set-cluster $(kubectl config view -o jsonpath='{.clusters[0].name}') \
---server=$(kubectl config view -o jsonpath='{.clusters[0].cluster.server}') --certificate-authority=k8s.crt \
---kubeconfig=auth/config/$USER --embed-certs
-kubectl config set-credentials $USER --client-certificate=user.crt --client-key=user.key --embed-certs --kubeconfig=auth/config/$USER
-kubectl config set-context $USER --cluster=$(kubectl config view -o jsonpath='{.clusters[0].name}') --user=$USER \
---kubeconfig=auth/config/$USER
+--server=$(kubectl config view -o jsonpath='{.clusters[0].cluster.server}') \
+--certificate-authority=k8s.crt \
+--embed-certs \
+--kubeconfig=$SCRIPT_DIR/../config/$USER
+kubectl config set-credentials $USER \
+--client-certificate=user.crt \
+--client-key=user.key \
+--embed-certs \
+--kubeconfig=$SCRIPT_DIR/../config/$USER
+kubectl config set-context $USER \
+--cluster=$(kubectl config view -o jsonpath='{.clusters[0].name}') \
+--user=$USER \
+--kubeconfig=$SCRIPT_DIR/../config/$USER
 
 # Clean up
 rm user.key

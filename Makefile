@@ -143,10 +143,6 @@ terraform_clear:
 	-rm -rf $(MANAGE_PATH)/.terraform
 	-rm $(MANAGE_PATH)/provider.tf
 
-.PHONY: user_create
-user_create:
-	auth/scripts/create_user.sh $(USER) $(GROUPS)
-
 .PHONY: users_clear
 users_clear:
 	-rm -rf auth/config

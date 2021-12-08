@@ -3,15 +3,68 @@ Authentication and authorization are crucial components in most production syste
 
 Examples of things to experiment with:
 
+- understanding Roles, RoleBindings, ClusterRoles, and ClusterRoleBindings grant namespaced and cluster-wide permissions
+- creating ServiceAccounts and their associated kubeconfigs
 - "creating" Kubernetes users and groups
 - creating new Rancher users
-- creating namespaced and cluster-wide custom roles through Kubernetes or Rancher
-- granting namedspaced and cluster-wide permissions to users and groups via role bindings through Kubernetes or Rancher
+- creating and granting namespaced and cluster-wide custom roles through Rancher
 
 ## Kubernetes' authentication and authorization model
 Kubernetes has two primary ways to identify clients: "users" and service accounts ("users" are used by external clients whereas service accounts are used by services internal to Kubernetes). Users are not explicitly represented as a Kubernetes objects but are instead implicitly derived from the Common Name field in the subject of the Kubernetes-signed certificate a client uses to authenticate with the cluster. Group membership is similarly implicit and found in the Organization fields.
 
-Role-based access control (RBAC) is the most popular authorization model used by Kubernetes. In this model, permissions (i.e., which actions are allowed on which resources) are captured as roles (Roles are namespace-specific permissions whereas ClusterRoles are cluster-wide). RoleBindings and ClusterRoleBindings are then used to bind roles to entities (e.g., "users", "groups", and service accounts) with RoleBindings binding roles to entities in specific namespaces whereas ClusterRoleBindings bind the roles to entities across the entire cluster.
+Role-based access control (RBAC) is the most popular authorization model used by Kubernetes. In this model, permissions (i.e., which actions are allowed on which resources) are captured as roles and role bindings are then used to bind roles to entities (e.g., "users", "groups", and service accounts).
+
+## Creating and testing Roles, RoleBindings, ClusterRoles, ClusterRoleBindings, and ServiceAccount-associated kubeconfigs
+Roles and ClusterRoles are the two resources used for defining permissions. The difference between them is that RoleBindings are a namespaced resource, defining permissions within a namespace, whereas ClusterRole is a cluster-wide resource, defining permissions across the cluster (though this also depends on the role binding used). Only ClusterRoles can define permissions for cluster-wide resources (e.g., namespaces, nodes).
+
+RoleBindings and ClusterRoleBindings are the two resources used for binding the permissions defined by roles to entities. ClusterRoleBindings can only bind ClusterRoles. When a ClusterRoleBinding is used to bind a ClusterRole, the entity that the ClusterRole is bound to gains the permissions defined by the ClusterRole across the cluster. RoleBindings can bind both ClusterRoles and Roles. When a RoleBinding is used to bind a ClusterRole, the entity that the ClusterRole is bound to gains the permissions defined by the ClusterRole in the namespace in which the RoleBinding exists with the exception of permissions for cluster-wide resources (e.g., an entity bound with a RoleBinding to a ClusterRole that grants permissions on Pods and Nodes will not be granted the Node permissions but will have Pod permissions within the RoleBinding's namespace). A RoleBinding that binds a Role must bind a Role that is within the same namespace as the RoleBinding and grants the Role's defined permissions within that namespace to the entity it is bound to.
+
+Below, we demonstrate the various cases above. Running the following commands creates a Role in the kube-system namespace that allows operations on Pods, a ClusterRole that allows operations on Nodes and Deployments, and two ServiceAccounts - default-sa and kube-system-sa in the default and kube-system namespaces, resptively. It then uses a ClusterRoleBinding to bind the ClusterRole to default-sa and RoleBindings to bind the ClusterRole to kube-system-sa and to bind the Role to both default-sa and kube-system-sa. It then generates kubeconfigs for both ServiceAccounts that can be used with kubectl.
+
+```
+kubectl apply -f auth/manifests
+auth/scripts/serviceaccount_kubeconfig.sh default-sa default
+auth/scripts/serviceaccount_kubeconfig.sh kube-system-sa kube-system
+```
+
+Attempting to perform an action on any resource other than Pods, Deployments, or Nodes with either ServiceAccount is expected to fail since permissions on these resources was not granted by any Role or ClusterRole. Since the ClusterRole grants permissions on Nodes and Deployments and bound to default-sa using a ClusterRoleBinding, we would expect default-sa to be able to perform actions on both across all namespaces.
+
+```
+$ auth/scripts/user_kubectl.sh default-sa get deployments -n default
+NAME                      READY   UP-TO-DATE   AVAILABLE   AGE
+...
+$ auth/scripts/user_kubectl.sh default-sa get deployments -n kube-system
+NAME                      READY   UP-TO-DATE   AVAILABLE   AGE
+$ auth/scripts/user_kubectl.sh default-sa get nodes
+NAME                          STATUS   ROLES                  AGE     VERSION
+...
+```
+
+Since kube-system-sa was bound to the ClusterRole using a RoleBinding, it should only have permissions on Deployments in the RoleBinding's namespace and not have permissions on Nodes.
+
+```
+$ auth/scripts/user_kubectl.sh kube-system-sa get deployments -n default
+Error from server (Forbidden): deployments.apps is forbidden: User "system:serviceaccount:kube-system:kube-system-sa" cannot list resource "deployments" in API group "apps" in the namespace "default"
+$ auth/scripts/user_kubectl.sh kube-system-sa get deployments -n kube-system
+NAME                      READY   UP-TO-DATE   AVAILABLE   AGE
+$ auth/scripts/user_kubectl.sh kube-system-sa get nodes
+Error from server (Forbidden): nodes is forbidden: User "system:serviceaccount:kube-system:kube-system-sa" cannot list resource "nodes" in API group "" at the cluster scope
+```
+
+Finally, both default-sa and kube-system-sa are bound via RoleBinding to the Role granting permissions on Pods in the kube-system namespace and so should only be able to perform actions on Pods in that namespace.
+
+```
+$ auth/scripts/user_kubectl.sh default-sa get pods -n default
+Error from server (Forbidden): pods is forbidden: User "system:serviceaccount:default:default-sa" cannot list resource "pods" in API group "" in the namespace "default"
+$ auth/scripts/user_kubectl.sh default-sa get pods -n kube-system
+NAME                                                  READY   STATUS    RESTARTS   AGE
+...
+$ auth/scripts/user_kubectl.sh kube-system-sa get pods -n default
+Error from server (Forbidden): pods is forbidden: User "system:serviceaccount:kube-system:kube-system-sa" cannot list resource "pods" in API group "" in the namespace "default"
+$ auth/scripts/user_kubectl.sh kube-system-sa get pods -n kube-system
+NAME                                                  READY   STATUS    RESTARTS   AGE
+...
+```
 
 ## Rancher
 Rancher is a Kubernetes cluster manager. It can be used to launch new Kubernetes clusters, manage existing ones (explore Kubernetes in a manner similar to kubectl but graphically), deploy and manage applications via Helm charts, monitor, alert, and aggregate logs across clusters, and provides user and group management and authorization capabilities. We will use Rancher primarily for its user management and authorization capabilities as group management requires external identity providers, we use Helm directly to deploy and manage applications, and we use Prometheus Operator for monitoring and alerting.
@@ -51,14 +104,30 @@ The Rancher user is essentially a composition of Kubernetes users across various
 The Kubernetes permissions portion of Rancher roles is implemented as Kubernetes ClusterRoles. Cluster roles are bound using ClusterRoleBindings while project roles are bound using RoleBindings in a project's namespaces.
 
 ## Creating and testing a user through Kubernetes
-To help test user creation and permissioning through Kubernetes, there are two Makefile targets: one to create new users (and specify the groups to which they belong) and one to permit users/groups read-only permissions within specific namespaces (see Commands below). When a new user is created, its kubeconfig file is placed in auth/config. These configs are used by auth/scripts/user_kubectl.sh (see Commands below) to access Kubernetes as any of the created users.
+To help test user creation and permissioning through Kubernetes, there are two scripts: one to create new users (and specify the groups to which they belong) and one to permit users/groups read-only permissions within specific namespaces (see Commands below). When a new user is created, its kubeconfig file is placed in auth/config. These configs are used by auth/scripts/user_kubectl.sh (see Commands below) to access Kubernetes as any of the created users.
 
 When a new user is created, if it or any of the groups it belongs to have not been granted the necessary permissions, you will notice that kubectl commands executed as the user will fail.
+
+```
+$ auth/scripts/create_user.sh test
+Generating a RSA private key
+...
+writing new private key to 'user.key'
+...
+certificatesigningrequest.certificates.k8s.io/test created
+certificatesigningrequest.certificates.k8s.io/test approved
+certificatesigningrequest.certificates.k8s.io "test" deleted
+Cluster "kind-k8splayground" set.
+User "test" set.
+Context "test" created.
+```
 ```
 $ auth/scripts/user_kubectl.sh test get pods
 Error from server (Forbidden): pods is forbidden: User "test" cannot list resource "pods" in API group "" in the namespace "default"
 ```
+
 Granting the relevant permissions to the user or a group it belongs to resolves this.
+
 ```
 $ NAMESPACE=default USERS=test make permissions_apply
 auth/scripts/read_only_permissions.sh default test User
@@ -67,7 +136,8 @@ $ auth/scripts/user_kubectl.sh test get pods
 NAME                                                      READY   STATUS    RESTARTS   AGE
 ...
 ```
-It is recommended to examine auth/scripts/create_user.sh and auth/scripts/read_only_permissions.sh, called by make create_user and make permissions_apply, respectively, to understand how client certificates and kubeconfigs are generated and to see an example of RoleBinding. In the case of role binding, instead of creating and binding a custom role, we bind the "view" role that comes with Kubernetes.
+
+It is recommended to examine auth/scripts/create_user.sh and auth/scripts/read_only_permissions.sh, the latter called by make permissions_apply, to understand how client certificates and kubeconfigs are generated and to see an example of RoleBinding. In the case of role binding, instead of creating and binding a custom role, we bind the "view" role that comes with Kubernetes.
 
 who-can is an extremely useful kubectl plugin for exploring which users, groups, and service accounts have permitted to execute any given command. It also shows the RoleBindings/ClusterRoleBindings responsible for binding the permission to these entities.
 
@@ -75,6 +145,7 @@ who-can is an extremely useful kubectl plugin for exploring which users, groups,
 Use the following flows to test creation of new users, granting them permissions, and accessing Kubernetes through Rancher (similar to setting up Rancher, many of these steps must be done through Rancher's UI and thus do not have Makefile targets like those in the previous section).
 
 Each of the following flows starts from the "Global" view (https://localhost:444/g/clusters).
+
 ```
 Add/delete users:
 Security -> Users -> Add User
@@ -110,9 +181,12 @@ Stop Rancher server:
 make rancher_stop
 
 Create user through Kubernetes:
-USER=<username> [GROUPS=<comma-separated list of groups>; optional] make user_create
+auth/scripts/create_user.sh <username> <comma-separated list of groups; optional>
 
-Clear users:
+Create service account kubeconfig:
+auth/scripts/serviceaccount_kubeconfig.sh <service account name> <service account namespace>
+
+Clear user and service account kubeconfigs:
 make users_clear
 
 Apply read-only permissions for users/groups in a given namespace:
@@ -121,8 +195,8 @@ NAMESPACE=<namespace> [USERS=<comma-separated list of users> GROUPS=<comma-separ
 Delete all K8sPlayground-applied permissions:
 make permissions_delete
 
-Access Kubernetes directly as a user:
-auth/scripts/user_kubectl.sh <username> <kubectl command>
+Access Kubernetes directly as a user/service account:
+auth/scripts/user_kubectl.sh <username/service account name> <kubectl command>
 
 Query which users, groups, and service accounts are permitted to execute a given command:
 kubectl who-can <kubectl command>
