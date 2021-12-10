@@ -233,3 +233,9 @@ fluentBitSidecar:
         record["tag"] = tag
         return 1, timestamp, record
     end
+
+prometheus-elasticsearch-exporter:
+  serviceMonitor:
+    enabled: true
+  es:
+    uri: http://elasticsearch-master.kube-system.svc.cluster.local:9200
