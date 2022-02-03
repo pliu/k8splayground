@@ -24,7 +24,7 @@ resource "rancher2_project" "default" {
 
 # Create "Test" project containing a namespace of the same name (lowercased)
 module "test_project" {
-  source     = "./project1"
+  source     = "./project2"
   name       = "Test"
   cluster_id = rancher2_cluster.test.id
   resource_quota = {
@@ -33,7 +33,7 @@ module "test_project" {
 }
 
 module "test_project2" {
-  source     = "./project1"
+  source     = "./project2"
   name       = "Test2"
   cluster_id = rancher2_cluster.test.id
 }

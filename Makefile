@@ -1,7 +1,7 @@
 CLUSTER_NAME=k8splayground
 KIND_IMAGE=kindest/node:v1.21.2
 RANCHER_CONTAINER_NAME=$(CLUSTER_NAME)-rancher
-RANCHER_HOST=$$(docker inspect $(RANCHER_CONTAINER_NAME) -f '{{ json .NetworkSettings.Networks.bridge.IPAddress }}')
+RANCHER_HOST=$$(docker inspect $(RANCHER_CONTAINER_NAME) -f '{{ json .NetworkSettings.Networks.kind.IPAddress }}')
 RANCHER_PORT=444
 POSTGRES_CONTAINER_NAME=$(CLUSTER_NAME)-postgres
 POSTGRES_PORT=5432
@@ -102,7 +102,7 @@ conftest_all:
 .PHONY: rancher_start
 rancher_start:
 	$(call preload_images,auth)
-	docker run -d --name $(RANCHER_CONTAINER_NAME) -p 127.0.0.1:$(RANCHER_PORT):443 rancher/rancher:v2.4.3
+	docker run -d --privileged --network kind --name $(RANCHER_CONTAINER_NAME) -p 127.0.0.1:$(RANCHER_PORT):443 rancher/rancher:v2.5.12
 	@echo "Docker network IP: $(RANCHER_HOST)"
 
 .PHONY: rancher_stop

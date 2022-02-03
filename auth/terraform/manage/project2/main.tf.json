@@ -1,0 +1,36 @@
+{
+    "resource": {
+        "rancher2_project": {
+            "project": {
+                "cluster_id": "${var.cluster_id}",
+                "name": "${var.name}"
+            }
+        },
+        "rancher2_namespace": {
+            "namespace": {
+                "project_id": "${rancher2_project.project.id}",
+                "name": "${lower(var.name)}"
+            }
+        }
+    },
+    "variable": {
+        "name": {
+            "type": "string",
+            "description": "The project's name"
+        },
+        "cluster_id": {
+            "type": "string",
+            "description": "The id of the cluster to which the project belongs"
+        },
+        "resource_quota": {
+            "type": "map(string)",
+            "description": "Resource quota for the namespace",
+            "default": null
+        }
+    },
+    "output": {
+        "project_id": {
+            "value": "${rancher2_project.project.id}"
+        }
+    }
+}
