@@ -24,9 +24,18 @@ spec:
       containers:
       - image: mock-server:0.0.1
         name: {{ .Release.Name }}
+        securityContext:
+          runAsUser: 9999
+          runAsGroup: 9999
         volumeMounts:
         - mountPath: /test-tmp
           name: host-tmp
+      - image: busybox
+        name: busybox
+        command: ["/bin/sh", "-c", "while :; do echo '.'; sleep 30 ; done"]
+        securityContext:
+          runAsUser: 99
+          runAsGroup: 99
       volumes:
       - name: host-tmp
         hostPath:

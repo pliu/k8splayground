@@ -13,8 +13,17 @@ kubeadmConfigPatches:
     local:
       extraArgs:
         listen-metrics-urls: "http://0.0.0.0:2381"
+  apiServer:
+    extraArgs:
+      feature-gates: EphemeralContainers=true
 nodes:
 - role: control-plane
+  kubeadmConfigPatches:
+  - |
+    kind: JoinConfiguration
+    nodeRegistration:
+      kubeletExtraArgs:
+        feature-gates: EphemeralContainers=true
   extraPortMappings:
   - containerPort: 2379
     hostPort: 2379
@@ -27,6 +36,7 @@ nodes:
     nodeRegistration:
       kubeletExtraArgs:
         node-labels: "mock-server=true"
+        feature-gates: EphemeralContainers=true
   extraPortMappings:
   - containerPort: 30000
     hostPort: 80
@@ -43,3 +53,4 @@ nodes:
     nodeRegistration:
       kubeletExtraArgs:
         register-with-taints: "playground_test=ensure_only_tolerations_run_here:NoSchedule"
+        feature-gates: EphemeralContainers=true
