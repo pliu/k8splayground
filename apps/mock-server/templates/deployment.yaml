@@ -30,14 +30,19 @@ spec:
         volumeMounts:
         - mountPath: /test-tmp
           name: host-tmp
+        - mountPath: /app/certs
+          name: certs
       - image: busybox
         name: busybox
         command: ["/bin/sh", "-c", "while :; do echo '.'; sleep 30 ; done"]
         securityContext:
-          runAsUser: 99
-          runAsGroup: 99
+          runAsUser: 0
+          runAsGroup: 0
       volumes:
       - name: host-tmp
         hostPath:
           path: /tmp
           type: Directory
+      - name: certs
+        secret:
+          secretName: {{ .Release.Name }}-certs

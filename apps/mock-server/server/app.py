@@ -27,4 +27,4 @@ def payload_dump(u_path):
 
 if __name__ == '__main__':
     signal.signal(signal.SIGTERM, receiveSignal)
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5000, ssl_context=('certs/cert.pem', 'certs/key.pem'))

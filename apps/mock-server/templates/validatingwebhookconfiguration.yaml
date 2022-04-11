@@ -1,0 +1,17 @@
+apiVersion: admissionregistration.k8s.io/v1beta1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: {{ .Release.Name }}
+webhooks:
+  - name: policy.k8splayground.com
+    clientConfig:
+      service:
+        name: {{ .Release.Name }}
+        namespace: {{ .Release.Namespace }}
+        path: "/"
+      caBundle: {{ .Files.Get "server/certs/cert.pem" | b64enc | quote }}
+    rules:
+      - operations: ["*"]
+        apiGroups: ["*"]
+        apiVersions: ["*"]
+        resources: ["pods/ephemeralcontainers"]

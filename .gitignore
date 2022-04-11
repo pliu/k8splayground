@@ -5,3 +5,4 @@ auth/config/
 auth/terraform/manage/provider.tf
 k8s-behaviour/etcd/
 apps/distributor/client/bin/client
+*.pem

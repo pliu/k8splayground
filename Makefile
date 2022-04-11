@@ -22,9 +22,10 @@ kind_create: kind_destroy
 	kubectl set env daemonset/calico-node FELIX_LOGSEVERITYSCREEN=warning -n kube-system
 	kubectl apply -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.47.0/example/prometheus-operator-crd/monitoring.coreos.com_servicemonitors.yaml
 	make etcd_cert
+	make mock_cert
 
 .PHONY: kind_destroy
-kind_destroy: users_clear etcd_clear
+kind_destroy: users_clear etcd_clear mock_clear
 	kind delete cluster --name $(CLUSTER_NAME)
 
 .PHONY: apply_all
@@ -56,6 +57,16 @@ prometheus_delete:
 prometheus_test_rules:
 	find apps/kube-prometheus-stack/rules -type f -name '*.yaml' -not -name '*_test.yaml' -exec promtool check rules {} +
 	find apps/kube-prometheus-stack/rules -type f -name '*_test.yaml' -exec promtool test rules {} +
+
+.PHONY: mock_cert
+mock_cert:
+	-mkdir apps/mock-server/server/certs
+	cd apps/mock-server/server && openssl req -new -x509 -newkey rsa:2048 -sha256 -nodes -keyout certs/key.pem -days 365 -out \
+	certs/cert.pem -config mock-server.default.svc.conf
+
+.PHONY: mock_clear
+mock_clear:
+	-rm -rf apps/mock-server/server/certs
 
 .PHONY: mock_build
 mock_build:

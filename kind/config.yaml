@@ -15,6 +15,7 @@ kubeadmConfigPatches:
         listen-metrics-urls: "http://0.0.0.0:2381"
   apiServer:
     extraArgs:
+      enable-admission-plugins: NodeRestriction,MutatingAdmissionWebhook,ValidatingAdmissionWebhook
       feature-gates: EphemeralContainers=true
 nodes:
 - role: control-plane

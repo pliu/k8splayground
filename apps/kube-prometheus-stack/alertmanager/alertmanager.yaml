@@ -45,5 +45,8 @@ receivers:
 - name: mock
   webhook_configs:
   - url: {{ .Values.alertmanagerConfig.url }}
+    http_config:
+      tls_config:
+        insecure_skip_verify: true
 
 templates: []

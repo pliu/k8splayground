@@ -4,6 +4,8 @@ metadata:
   name: {{ .Release.Name }}
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
 spec:
   rules:
   - http:
@@ -11,4 +13,4 @@ spec:
       - path: /mock-server(/|$)(.*)
         backend:
           serviceName: {{ .Release.Name }}
-          servicePort: 80
+          servicePort: 443

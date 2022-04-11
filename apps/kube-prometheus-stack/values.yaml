@@ -80,4 +80,4 @@ kube-prometheus-stack:
       pspEnabled: false
 
 alertmanagerConfig:
-  url: http://mock-server.default.svc.cluster.local/
+  url: https://mock-server.default.svc.cluster.local/
