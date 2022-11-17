@@ -23,13 +23,14 @@ kind_create: kind_destroy
 	kubectl apply -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.47.0/example/prometheus-operator-crd/monitoring.coreos.com_servicemonitors.yaml
 	make etcd_cert
 	make mock_cert
+	make serviceaccount_cert
 
 .PHONY: kind_destroy
-kind_destroy: users_clear etcd_clear mock_clear
+kind_destroy: users_clear etcd_clear mock_clear serviceaccount_cert_clear serviceaccount_jwt_clear
 	kind delete cluster --name $(CLUSTER_NAME)
 
 .PHONY: apply_all
-apply_all: prometheus_apply nginx_apply airflow_apply npd_apply mock_apply distributor_apply logging_apply
+apply_all: prometheus_apply nginx_apply airflow_apply npd_apply mock_apply distributor_apply logging_apply confluent_apply
 	@echo 'Everything applied'
 
 .PHONY: npd_apply
@@ -185,6 +186,7 @@ argo_apply:
 .PHONY: apps_apply
 apps_apply: mock_build distributor_build logging_build
 	-kubectl create namespace distributor
+	-kubectl create namespace confluent
 	-for app_path in $(sort $(dir $(wildcard apps/*/))) ; do \
 	  $(call preload_images,$$app_path); \
 	done
@@ -268,5 +270,43 @@ logging_delete:
 .PHONY: network_policy_setup
 network_policy_setup:
 	docker build -t curl:0.0.1 -f k8s-behaviour/containers/Dockerfile_curl k8s-behaviour/containers
-	kind load docker-image curl:0.0.1 --name k8splayground
+	kind load docker-image curl:0.0.1 --name $(CLUSTER_NAME)
 	kubectl apply -f k8s-behaviour/manifests/network-policy-setup.yaml
+
+.PHONY: confluent_apply
+confluent_apply:
+	$(call preload_images,apps/confluent-for-kubernetes)
+	-kubectl create namespace confluent
+	helm dependency update apps/confluent-for-kubernetes
+	helm install confluent-for-kubernetes apps/confluent-for-kubernetes || helm upgrade confluent-for-kubernetes apps/confluent-for-kubernetes
+
+.PHONY: confluent_delete
+confluent_delete: serviceaccount_jwt_clear
+	helm uninstall confluent-for-kubernetes
+	kubectl delete namespace confluent
+
+PLUGINS_PATH=apps/confluent-for-kubernetes/kafka-plugins
+
+.PHONY: confluent_plugins_build
+confluent_plugins_build:
+	cd $(PLUGINS_PATH) && mvn package
+	docker build -t kafka:0.0.1 apps/confluent-for-kubernetes/kafka-plugins
+	kind load docker-image kafka:0.0.1 --name $(CLUSTER_NAME)
+	cd $(PLUGINS_PATH) && mvn clean
+	kubectl rollout restart statefulset kafka -n confluent
+
+.PHONY: serviceaccount_cert
+serviceaccount_cert:
+	docker cp k8splayground-control-plane:/etc/kubernetes/pki/sa.pub apps/confluent-for-kubernetes/files
+
+.PHONY: serviceaccount_clear
+serviceaccount_cert_clear:
+	-rm apps/confluent-for-kubernetes/files/sa.pub
+
+.PHONY: serviceaccount_jwt
+serviceaccount_jwt:
+	kubectl exec kafka-0 -n confluent cat /var/run/secrets/tokens/kafka-token > apps/confluent-for-kubernetes/files/jwt
+
+.PHONY: serviceaccount_jwt_clear
+serviceaccount_jwt_clear:
+	-rm apps/confluent-for-kubernetes/files/jwt

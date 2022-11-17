@@ -1,7 +1,7 @@
 # NGINX Ingress
 NGINX Ingress is the NGINX implementation of Kubernetes' ingress functionality. Ingress is Kubernetes' mechanism for routing external traffic to internal endpoints. In this project, it is used to simplify interacting with the UIs of many of the other deployed applications (e.g., Prometheus, Grafana, and Alertmanager from kube-prometheus-stack).
 
-As mentioned in the root README, when creating the cluster, we port-forward localhost ports 80 and 443 on the local machine to ports 30000 and 30001 on one of the Docker worker "hosts". nginx-ingress is configured as a NodePort service such that all host traffic on ports 30000 and 30001 is sent to it. NGINX then routes the traffic to its destination based on the configured NGINX rules (configured in Ingress objects), thus completing the routing of traffic from the local machine to a Kubernetes-hosted application.
+When creating the cluster, we port-forward localhost ports 80 and 443 on the local machine to ports 30000 and 30001 on one of the Docker worker "hosts". nginx-ingress is configured as a NodePort service such that all host traffic on ports 30000 and 30001 is sent to it. NGINX then routes the traffic to its destination based on the configured NGINX rules (configured in Ingress objects), thus completing the routing of traffic from the local machine to a Kubernetes-hosted application.
 
 The convention for this project is for applications that wish to expose endpoints via ingress to supply their own Ingress manifest (e.g., mock-server, kube-prometheus-stack). This is because Ingress is a native Kubernetes type which has no effect in the absense of an Ingress implementation.
 

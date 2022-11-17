@@ -1,0 +1,45 @@
+confluent-for-kubernetes:
+  namespaceList:
+  - confluent
+
+prometheus-kafka-exporter:
+  kafkaServer:
+  - kafka.confluent.svc.cluster.local:9071
+
+  prometheus:
+    serviceMonitor:
+      enabled: true
+      namespace: default
+
+  sasl:
+    enabled: true
+    scram:
+      enabled: true
+      mechanism: plain
+      username: test1
+      password: password1
+
+  rbac:
+    create: false
+    pspEnabled: false
+
+  serviceAccount:
+    create: false
+
+kminion:
+  serviceAccount:
+    create: false
+
+  serviceMonitor:
+    create: true
+
+  kminion:
+    config:
+      kafka:
+        brokers:
+        - kafka.confluent.svc.cluster.local:9071
+        sasl:
+          enabled: true
+          mechanism: PLAIN
+          username: test1
+          password: password1

@@ -6,7 +6,7 @@ NAMESPACE=$2
 SECRET_NAME=$(kubectl get secrets -n $NAMESPACE | grep $SERVICEACCOUNT_NAME-token- | awk -F " " '{print $1}')
 
 # Retrieve Kubernetes certificate
-kubectl config view -o jsonpath='{.clusters[0].cluster.certificate-authority-data}' --raw | base64 --decode - > k8s.crt
+kubectl config view -o jsonpath='{.clusters[0].cluster.certificate-authority-data}' --raw | base64 --decode > k8s.crt
 
 # Create kubeconfig
 kubectl config set-cluster $(kubectl config view -o jsonpath='{.clusters[0].name}') \

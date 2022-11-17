@@ -6,4 +6,8 @@ auth/terraform/manage/provider.tf
 k8s-behaviour/etcd/
 apps/distributor/client/bin/client
 *.pem
+target/
+apps/confluent-for-kubernetes/files/jwt
+apps/confluent-for-kubernetes/files/sa.pub
+apps/confluent-for-kubernetes/kafka-plugins/dependency-reduced-pom.xml
 venv/

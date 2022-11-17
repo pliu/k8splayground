@@ -1,0 +1,6 @@
+lowercaseOutputName: true
+
+rules:
+- patterns: kmf.services<type=consume-service, name=(?:.+)><>([a-zA-Z0-9.\-_]+)
+  name: kmf_services_$1
+  type: GAUGE

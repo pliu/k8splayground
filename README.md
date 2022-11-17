@@ -3,8 +3,6 @@ K8sPlayground is a kind-based (Kubernetes in Docker) environment built to facili
 
 As its name suggests, kind works by spinning up Docker containers to act as "hosts" in a Kubernetes cluster. These Docker "hosts" are subsequently managed by kubeadm to set up Kubernetes components (e.g., kubelet, etcd, api-server, controller-manager, scheduler, coreDNS, kube-proxy). We have disabled kindnet - the default kind CNI plugin - in favor of using Calico, which is installed as part of the Makefile target after the kind cluster is created.
 
-When the cluster is started, localhost ports 80 and 443 will be mapped to one of the Docker worker "hosts" and localhost port 2379 will be mapped to the Docker control plane "host" (specified in kind/config.yaml).
-
 Examples of things to experiment with:
 
 - kubectl commands
@@ -31,6 +29,10 @@ etcdctl 3.4.9
 lens 3.5.1
 go 1.13.5, 1.17.1
 fluent-bit v1.5.6
+kafkacat 1.5.0 kcat 1.7.0
+kafka-acl.sh 3.3.1
+maven 3.8.7
+javac 19.0.1
 ```
 
 ## Repository structure
@@ -75,6 +77,7 @@ Current applications include:
 - [Airflow](apps/airflow/README.md)
 - [distributor](apps/distributor/README.md)
 - [logging](apps/logging/README.md)
+- [Confluent for Kubernetes](apps/confluent-for-kubernetes/README.md)
 
 Each application folder contains, at the very least, its own README - with more information on what the application does and how to use it - and Chart.yaml. The Chart.yaml contains some basic metadata about the chart (the package of Kubernetes manifests that defines the Kubernetes objects required to deploy the application) such as name, version, and any dependencies. In addition, it may contain a templates folder that contains the templates from which the actual manifests are rendered. The values used in the rendering are found in the values.yaml file. If none of the templates require rendering, then no values.yaml is needed (e.g., mock-server). If including another chart as a dependency, one can configure the imported chart using the values.yaml file (e.g., kube-prometheus-stack, nginx-ingress).
 
