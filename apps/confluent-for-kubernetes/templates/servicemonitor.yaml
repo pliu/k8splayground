@@ -1,0 +1,17 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: kafka-servicemonitor
+  namespace: confluent
+spec:
+  endpoints:
+  - path: /metrics
+    port: prometheus
+  namespaceSelector:
+    matchNames:
+    - confluent
+  selector:
+    matchLabels:
+      cr-name: kafka
+      type: kafka
+---

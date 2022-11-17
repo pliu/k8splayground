@@ -39,14 +39,37 @@ nodes:
         node-labels: "mock-server=true"
         feature-gates: EphemeralContainers=true
   extraPortMappings:
-  - containerPort: 30000
+  - containerPort: 30000  # used for nginx-ingress http
     hostPort: 80
     listenAddress: 127.0.0.1
     protocol: TCP
-  - containerPort: 30001
+  - containerPort: 30001  # used for nginx-ingress https
     hostPort: 443
     listenAddress: 127.0.0.1
     protocol: TCP
+  - containerPort: 31000  # used for kafka bootstrapping
+    hostPort: 31000
+    protocol: TCP
+  - containerPort: 31001  # used for kafka broker
+    hostPort: 31001
+    protocol: TCP
+  - containerPort: 31002  # used for kafka broker
+    hostPort: 31002
+    protocol: TCP
+  - containerPort: 31003  # used for kafka broker
+    hostPort: 31003
+    protocol: TCP
+  - containerPort: 31010  # used for schema registry
+    hostPort: 31010
+    protocol: TCP
+- role: worker
+  kubeadmConfigPatches:
+  - |
+    kind: JoinConfiguration
+    nodeRegistration:
+      kubeletExtraArgs:
+        register-with-taints: "playground_test=ensure_only_tolerations_run_here:NoSchedule"
+        feature-gates: EphemeralContainers=true
 - role: worker
   kubeadmConfigPatches:
   - |

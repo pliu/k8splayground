@@ -1,0 +1,13 @@
+apiVersion: v2
+name: confluent-for-kubernetes-playground
+version: 0.0.1
+dependencies:
+- name: confluent-for-kubernetes
+  version: 0.581.16
+  repository: https://packages.confluent.io/helm
+- name: prometheus-kafka-exporter
+  version: 1.8.0
+  repository: https://prometheus-community.github.io/helm-charts
+- name: kminion
+  version: 0.12.0
+  repository: https://raw.githubusercontent.com/cloudhut/kminion/master/charts/archives

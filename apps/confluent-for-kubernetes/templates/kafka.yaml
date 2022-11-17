@@ -1,0 +1,63 @@
+apiVersion: platform.confluent.io/v1beta1
+kind: Kafka
+metadata:
+  name: kafka
+  namespace: confluent
+spec:
+  authorization:
+    type: simple
+    superUsers:
+    - "User:test1"
+  listeners:
+    external:
+      externalAccess:
+        nodePort:
+          host: localhost
+          nodePortOffset: 31000
+        type: nodePort
+  replicas: 3
+  image:
+    application: kafka:0.0.1
+    init: confluentinc/confluent-init-container:2.5.0
+  dataVolumeCapacity: 10Gi
+  oneReplicaPerNode: true
+  metricReporter:
+    enabled: false
+  telemetry:
+    global: false
+  mountedVolumes:
+    volumeMounts:
+    - mountPath: /var/run/secrets/tokens
+      name: kafka-token
+    - mountPath: /var/run/secrets/jaas
+      name: jaas-config
+    volumes:
+    - name: kafka-token
+      projected:
+        sources:
+        - serviceAccountToken:
+            path: kafka-token
+            expirationSeconds: 7200
+            audience: kafka
+    - name: jaas-config
+      secret:
+        secretName: {{ template "jaas-secret-name" }}
+  configOverrides:
+    server:
+    - confluent.balancer.enable=false
+    - confluent.reporters.telemetry.auto.enable=false
+    - listener.security.protocol.map=EXTERNAL:SASL_PLAINTEXT,INTERNAL:SASL_PLAINTEXT,REPLICATION:SASL_PLAINTEXT
+    - listener.name.external.sasl.enabled.mechanisms=PLAIN
+    - listener.name.internal.sasl.enabled.mechanisms=PLAIN
+    - listener.name.replication.sasl.enabled.mechanisms=PLAIN
+    - sasl.mechanism.inter.broker.protocol=PLAIN
+    - kafka.rest.enable=false
+    # - listener.name.external.plain.sasl.server.callback.handler.class=com.github.pliu.PlainServerCallbackHandler
+  podTemplate:
+    envVars:
+    - name: KAFKA_OPTS
+      value: -Djava.security.auth.login.config=/var/run/secrets/jaas/{{ template "jaas-config-filename" }}
+    tolerations:
+    - key: playground_test
+      operator: Exists
+      effect: NoSchedule

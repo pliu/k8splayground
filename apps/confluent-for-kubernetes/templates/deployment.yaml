@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "kafka-monitor-name" }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ template "kafka-monitor-name" }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "kafka-monitor-name" }}
+    spec:
+      terminationGracePeriodSeconds: 0
+      containers:
+      - name: {{ template "kafka-monitor-name" }}
+        image: navikt/kafka-monitor:4
+        volumeMounts:
+        - name: config
+          mountPath: /config
+        - name: jmx-config
+          mountPath: /jmx-config
+        env:
+          - name: ZOOKEEPER_CONNECT
+            value: zookeeper.confluent.svc.cluster.local:2181/kafka-confluent
+          - name: BOOTSTRAP_SERVERS
+            value: kafka.confluent.svc.cluster.local:9071
+          - name: SECURITY_PROTOCOL
+            value: SASL_PLAINTEXT
+          - name: SASL_MECHANISM
+            value: PLAIN
+          - name: LOG_LEVEL
+            value: INFO
+          - name: LOG_LEVEL_KAFKA
+            value: WARN
+          - name: PRODUCE_DELAY
+            value: "100"
+          - name: MONITOR_TOPIC
+            value: kafka-monitor
+          - name: CREATE_TOPIC
+            value: "true"
+          - name: REPLICATION_FACTOR
+            value: "3"
+          - name: PARTITIONS_TO_BROKERS_RATIO
+            value: "2"
+          - name: JAAS_CONFIG
+            value: "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"test1\" password=\"password1\";"
+          # - name: KAFKA_JMX_OPTS
+          #   value: "-javaagent:/kafka-monitor/prometheus/jmx_prometheus_javaagent-0.12.0.jar=8080:/jmx-config/jmx-config.yaml"
+        ports:
+        - name: http
+          containerPort: 8000
+          protocol: TCP
+      volumes:
+      - name: config
+        emptyDir: {}
+      - name: jmx-config
+        configMap:
+          name: {{ template "kafka-monitor-name" }}
