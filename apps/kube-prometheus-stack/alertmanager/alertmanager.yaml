@@ -11,7 +11,7 @@ route:
   - receiver: "null"
     match:
       alertname: Watchdog
-  # Any alert with severity="critical" will match this node, continue matching against its children (nodes A and B)
+  # Any alert with severity="critical" will match this node, continue matching against its children (nodes B and C)
   # and its next sibling (node D, because continue: true)
   - receiver: "null"                  # node A
     continue: true
@@ -24,21 +24,21 @@ route:
   #   match:
   #     issue_type: user-facing
   #   continue: true
-    # Any alert with issue_type="internal", regardless of whether it matched node B (either it matched node B and
+    # Any alert with other_type="internal", regardless of whether it matched node B (either it matched node B and
     # continue: true allows it to continue to this node or it did not match and so it continues anyway), will match
-    # this node, stop here (because continue: false by default), and call "operations_alerting" (because no
-    # children)
+    # this node, stop matching subsequent siblings (because continue: false by default), and call
+    # "operations_alerting" (because no children)
   # - receiver: operations_alerting   # node C
   #   match:
-  #     issue_type: internal
+  #     other_type: internal
     # If an alert matches neither node B or C, then the last node it matched was node A, so node A's receiver is
     # called
-  # Any alert will match this node since it has no match criteria, stop here (because continue: false by default),
-  # and call "mock" (because no children)
+  # Every alert will match this node (because node A has continue: true and this node has no match criteria), stop
+  # here (because continue: false by default), and call "mock" (because no children)
   - receiver: mock                    # node D
-  group_wait: 30s
+  group_wait: 10s
   group_interval: 1m
-  repeat_interval: 12h
+  repeat_interval: 10m
 
 receivers:
 - name: "null"

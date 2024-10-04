@@ -38,6 +38,21 @@ kube-prometheus-stack:
 
   prometheus:
     prometheusSpec:
+      alertingEndpoints:
+      - apiVersion: v2
+        name: kube-prometheus-stack-alertmanager
+        namespace: default
+        pathPrefix: /
+        port: web
+      - apiVersion: v2
+        name: mock-server
+        namespace: default
+        pathPrefix: /
+        port: https
+        scheme: https
+        tlsConfig:
+          insecureSkipVerify: true
+
       externalUrl: prometheus
       ruleSelectorNilUsesHelmValues: false
       serviceMonitorSelectorNilUsesHelmValues: false
