@@ -29,7 +29,7 @@ kind_destroy: users_clear etcd_clear mock_clear
 	kind delete cluster --name $(CLUSTER_NAME)
 
 .PHONY: apply_all
-apply_all: prometheus_apply nginx_apply airflow_apply npd_apply mock_apply distributor_apply logging_apply
+apply_all: prometheus_apply nginx_apply airflow_apply npd_apply mock_apply distributor_apply logging_apply vault_apply
 	@echo 'Everything applied'
 
 .PHONY: npd_apply
@@ -270,3 +270,12 @@ network_policy_setup:
 	docker build -t curl:0.0.1 -f k8s-behaviour/containers/Dockerfile_curl k8s-behaviour/containers
 	kind load docker-image curl:0.0.1 --name k8splayground
 	kubectl apply -f k8s-behaviour/manifests/network-policy-setup.yaml
+
+.PHONY: vault_apply
+vault_apply:
+	$(call preload_images,apps/vault)
+	ls
+
+.PHONY: vault_delete
+vault_delete:
+	ls
