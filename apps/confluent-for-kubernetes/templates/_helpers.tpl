@@ -21,3 +21,15 @@ kafka-monitor
 {{- define "kafka-monitor-jmx-config" -}}
 jmx-config.yaml
 {{- end -}}
+
+{{- define "mirrormaker2-name" -}}
+mirrormaker2
+{{- end -}}
+
+{{- define "connect-config" -}}
+connect.properties
+{{- end -}}
+
+{{- define "mirrormaker2-config" -}}
+mm2.properties
+{{- end -}}

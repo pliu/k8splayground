@@ -26,10 +26,9 @@ def failure_callback(err, msg):
 
 start = time.time()
 producer = Producer(conf)
-for i in range(2000):
-    producer.produce(topic="test-topic", value=get_string(51, 81), on_delivery=failure_callback)
+for i in range(2):
+    producer.produce(topic="test_topic", value=get_string(51, 81), on_delivery=failure_callback)
     producer.poll()
 producer.flush()
-producer.poll()
 end = time.time()
 print(end - start)

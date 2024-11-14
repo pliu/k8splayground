@@ -12,6 +12,9 @@ spec:
   dataVolumeCapacity: 10Gi
   logVolumeCapacity: 10Gi
   podTemplate:
+    podSecurityContext:
+      runAsUser: 0
+      runAsNonRoot: false
     tolerations:
     - key: playground_test
       operator: Exists

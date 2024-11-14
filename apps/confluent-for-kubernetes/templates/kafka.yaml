@@ -17,7 +17,8 @@ spec:
         type: nodePort
   replicas: 3
   image:
-    application: kafka:0.0.1
+    # application: kafka:0.0.1
+    application: confluentinc/cp-server:7.3.0
     init: confluentinc/confluent-init-container:2.5.0
   dataVolumeCapacity: 10Gi
   oneReplicaPerNode: true
@@ -54,6 +55,9 @@ spec:
     - kafka.rest.enable=false
     # - listener.name.external.plain.sasl.server.callback.handler.class=com.github.pliu.PlainServerCallbackHandler
   podTemplate:
+    podSecurityContext:
+      runAsUser: 0
+      runAsNonRoot: false
     envVars:
     - name: KAFKA_OPTS
       value: -Djava.security.auth.login.config=/var/run/secrets/jaas/{{ template "jaas-config-filename" }}

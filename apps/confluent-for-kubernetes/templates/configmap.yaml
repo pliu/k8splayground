@@ -4,3 +4,12 @@ metadata:
   name: {{ template "kafka-monitor-name" }}
 data:
   {{ template "kafka-monitor-jmx-config" }}: |- {{ $.Files.Get "files/jmx_exporter_config.yaml" | nindent 4 }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "mirrormaker2-name" }}
+  namespace: confluent
+data:
+  {{ template "connect-config" }}: |- {{ $.Files.Get "files/connect.properties" | nindent 4 }}
+  {{ template "mirrormaker2-config" }}: |- {{ $.Files.Get "files/mm2.properties" | nindent 4 }}

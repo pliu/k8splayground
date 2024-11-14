@@ -21,7 +21,7 @@ Build plugins, put into image, and push image to workers:
 make confluent_plugins_build
 
 Create topic:
-/kafka-topics.sh --bootstrap-server localhost:31000 --command-config apps/confluent-for-kubernetes/files/kafka.properties --topic <topic name> --create
+./kafka-topics.sh --bootstrap-server localhost:31000 --command-config apps/confluent-for-kubernetes/files/kafka.properties --topic <topic name> --create
 
 Add ACL entry:
 ./kafka-acls.sh --bootstrap-server localhost:31000 --command-config apps/confluent-for-kubernetes/files/kafka.properties --add --allow-principal "User:test2" --operation Write --topic <topic name>

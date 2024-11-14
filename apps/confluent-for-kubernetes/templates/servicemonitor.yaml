@@ -14,4 +14,3 @@ spec:
     matchLabels:
       cr-name: kafka
       type: kafka
----

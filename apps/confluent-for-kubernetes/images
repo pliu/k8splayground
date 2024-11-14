@@ -1,3 +1,4 @@
+confluentinc/cp-server:7.3.0
 confluentinc/cp-zookeeper:7.3.0
 confluentinc/confluent-init-container:2.5.0
 confluentinc/confluent-operator:0.581.16
